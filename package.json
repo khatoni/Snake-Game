@@ -1,0 +1,26 @@
+{
+  "name": "snake-game",
+  "version": "0.0.0",
+  "description": "Single-play and multi-player snake game",
+  "keywords": [
+    "snake",
+    "snake game",
+    "single player snake",
+    "multi player snake"
+  ],
+  "homepage": "https://github.com/khatoni/JS-Advanced#readme",
+  "bugs": {
+    "url": "https://github.com/khatoni/JS-Advanced/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khatoni/JS-Advanced.git"
+  },
+  "license": "ISC",
+  "author": "Antonio Georgiev, Georgi Terziev",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
