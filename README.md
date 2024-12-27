@@ -14,3 +14,6 @@ The project represents the classic snake game with two gameplay options:
 - Both players control their snakes on the same board.
 - Navigate carefully and avoid collisions with the walls, your tail, and your opponent's snake.
 - The last player standing wins!
+
+### Links:
+https://jakelazaroff.com/words/an-interactive-intro-to-crdts/
