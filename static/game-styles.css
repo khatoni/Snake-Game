@@ -14,11 +14,13 @@ body {
 }
 
 .snake {
-	background-color: #414141;
-    border: #5a5a5a 1px dotted;
+	background-color: green;
+}
+.snake-head {
+	background-color: darkgreen;
+	border: 3px solid black;
 }
 
 .food {
-	background-color: #dedede;
-	border: #999 5px solid;
+	background-color: red;
 }

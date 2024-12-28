@@ -20,7 +20,7 @@ function initialize() {
 		moveSnake();
         checkCollision();
 		renderBoard();
-	}, 150);
+	}, 200);
 }
 
 function endGame() {
@@ -66,11 +66,11 @@ function moveSnake() {
 function renderBoard() {
 	board.innerHTML = "";
 
-	snake.forEach((position) => {
+	snake.forEach((position, i) => {
 		const snakeElement = document.createElement("div");
 		snakeElement.style.gridColumn = position.x;
 		snakeElement.style.gridRow = position.y;
-		snakeElement.classList.add("snake");
+		snakeElement.classList.add(i === 0 ? "snake-head" : "snake");
 		board.appendChild(snakeElement);
 	});
 
