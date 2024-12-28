@@ -16,6 +16,14 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
+app.get('/pages/single-player', (req, res) => {
+  res.render('single-player');
+});
+
+app.get('/pages/multi-player', (req, res) => {
+  res.render('multi-player');
+});
+
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}. Visit http://localhost:${PORT}`);
 });
