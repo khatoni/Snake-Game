@@ -3,6 +3,7 @@ const WebSocket = require('ws');
 function configureWsServer(server) {
     const webSocketServer = new WebSocket.Server({ server });
 
+    const generatedGUIDS = new Set();
     // guid => socket
     const guidToSocket = new Map();
     const socketToGuid = new Map(); // ?
@@ -15,12 +16,12 @@ function configureWsServer(server) {
 
     webSocketServer.on('connection', (ws) => {
         // create guid and send to client
-        const myGuid = "";
+        const myGuid = createGUID(generatedGUIDS);
         let myRoom = -1;
 
         console.log('Client connected');
       
-        ws.send('Welcome to the WebSocket server!');
+        ws.send('Welcome to the WebSocket server!' + myGuid);
         ws.on('message', (message) => {
             console.log('Received:', message.toString());
             
@@ -56,3 +57,17 @@ function configureWsServer(server) {
 }
 
 module.exports = configureWsServer;
+
+function createGUID(generatedGUIDS) {
+    const possibleSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    while (true) {
+        let guid="";
+        for (let i = 0; i < 5; i++) {
+            guid += possibleSymbols.charAt(Math.floor(Math.random() * possibleSymbols.length));
+        }
+        if (!generatedGUIDS.has(guid)) {
+            generatedGUIDS.add(guid);
+            return guid;
+        }
+    }
+}
