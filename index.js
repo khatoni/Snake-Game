@@ -11,6 +11,7 @@ const webSocketServer = configureWsServer(server);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/pages'));
+app.use(express.static(path.resolve('static')));
 
 app.get('/', (req, res) => {
   res.render('home');
