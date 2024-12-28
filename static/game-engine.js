@@ -3,8 +3,8 @@ const boardSize = 20;
 const gameSpeed = 500;
 
 const snake = [];
-const food = { x: 5, y: 5 };
-
+let food = { x: 5, y: 5 };
+let gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
 let direction = { x: 1, y: 0 };
@@ -13,7 +13,7 @@ initialize();
 
 function initialize() {
 	snake.push({ x: 10, y: 10 });
-
+	gameState[10][10] = 1;
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
@@ -53,12 +53,15 @@ function handleUserInput() {
 function moveSnake() {
 	const head = snake[0];
 	const newHead = { x: head.x + direction.x, y: head.y + direction.y };
-
 	snake.unshift(newHead);
+	gameState[newHead.x][newHead.y] = 1;
 	if(newHead.x === food.x && newHead.y === food.y) {
 		// Snake ate the food
+		food = generateFood(gameState);
 	}
 	else {
+		const tailElement = snake[snake.length - 1];
+		gameState[tailElement.x][tailElement.y] = 0;
 		snake.pop();
 	}
 }
@@ -99,4 +102,16 @@ function checkCollision() {
 
 function isInsideBoard(position) {
     return position.x >= 1 && position.x <= boardSize && position.y >= 1 && position.y <= boardSize;
+}
+
+// Assumes that gameState is matrix[20][20]
+//TODO: Bug
+function generateFood(gameState) {
+	while(true) {
+		let foodX = Math.round(Math.random() * 20);
+		let foodY = Math.round(Math.random() * 20);
+		if(!gameState[foodX][foodY]) {
+			return {x: foodX, y: foodY};
+		}
+	}
 }
