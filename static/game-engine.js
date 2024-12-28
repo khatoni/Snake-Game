@@ -1,4 +1,4 @@
-const board = document.getElementsByClassName("game-board");
+const board = document.getElementById("game-board");
 const boardSize = 20;
 const gameSpeed = 500;
 
@@ -7,15 +7,18 @@ let gameInterval;
 
 let direction = { x: 1, y: 0 };
 
+initialize();
+
 function initialize() {
-	snakePositions.push({ x: 10, y: 10 });
+	snake.push({ x: 10, y: 10 });
 
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
 		moveSnake();
+        checkCollision();
 		renderSnake();
-	}, 500);
+	}, 100);
 }
 
 function endGame() {
@@ -42,20 +45,20 @@ function handleUserInput() {
 }
 
 function moveSnake() {
-	const head = snakePositions[0];
+	const head = snake[0];
 	const newHead = { x: head.x + direction.x, y: head.y + direction.y };
 
-	snakePositions.unshift(newHead);
-	snakePositions.pop();
+	snake.unshift(newHead);
+	snake.pop();
 }
 
 function renderSnake() {
 	board.innerHTML = "";
 
-	snakePositions.forEach((position) => {
+	snake.forEach((position) => {
 		const snakeElement = document.createElement("div");
-		snakeElement.style.gridColumnStart = position.x;
-		snakeElement.style.gridRowStart = position.y;
+		snakeElement.style.gridColumn = position.x;
+		snakeElement.style.gridRow = position.y;
 		snakeElement.classList.add("snake");
 		board.appendChild(snakeElement);
 	});
@@ -63,7 +66,7 @@ function renderSnake() {
 
 function checkCollision() {
 	const head = snake[0];
-
+    
 	if (!isInsideBoard(head)) {
 		endGame();
         return;
