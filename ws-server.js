@@ -1,5 +1,10 @@
 const WebSocket = require('ws');
+const PriorityQueue = require('./priority_queue');
 
+const roomsIds = new PriorityQueue();
+for(let i = 0; i < 20; i++) {
+    roomsIds.push(i);
+}
 function configureWsServer(server) {
     const webSocketServer = new WebSocket.Server({ server });
 
@@ -9,7 +14,7 @@ function configureWsServer(server) {
     const socketToGuid = new Map(); // ?
     // rooms object = {};
     // key -> room id, value -> array of guids/sockets
-
+    const rooms = [];
     // guid both 
     // first sends event => vtoriq guid
     // lobby s id 1: {guid1: 1, guid2: 2}
@@ -17,6 +22,7 @@ function configureWsServer(server) {
     webSocketServer.on('connection', (ws) => {
         // create guid and send to client
         const myGuid = createGUID(generatedGUIDS);
+        guidToSocket.set(myGuid,ws);
         let myRoom = -1;
 
         console.log('Client connected');
@@ -24,7 +30,19 @@ function configureWsServer(server) {
         ws.send('Welcome to the WebSocket server!' + myGuid);
         ws.on('message', (message) => {
             console.log('Received:', message.toString());
-            
+            const event = JSON.parse(message);
+            if (event.type === 'joinMeWith') {
+                const otherGuid = event.data;
+                if(!checkExistingGuid(guidToSocket, otherGuid)) {
+                    ws.send(`There is not such guid existing: ${otherGuid}`);
+                    return;
+                }
+                if(myGuid === otherGuid) {
+                    ws.send(`You cannot enter the same guid`);
+                    return;
+                }
+                joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+            }
             // Broadcast to all clients
             webSocketServer.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
@@ -33,8 +51,11 @@ function configureWsServer(server) {
             });
         });
         // priority queue for maximum 20 rooms
-        ws.on('joinMeWith', (tonyGuid) => {
-            // create room with me and tonyGuid
+        ws.on('joinMeWith', (otherGuid) => {
+            let freeRoomId = roomsIds.top();
+            roomsIds.pop();
+            let room = {id:freeRoomId, guids:[myGuid, otherGuid]};
+            rooms.push(room);
             // rooms[i++] = [myGuid, tonyGuid];
             // myRoom = i - 1;
 
@@ -70,4 +91,25 @@ function createGUID(generatedGUIDS) {
             return guid;
         }
     }
+}
+
+function joinRoom(rooms, guidToSocket, myGuid, otherGuid) {
+    let freeRoomId = roomsIds.pop();
+    let room = {id:freeRoomId, guids:[myGuid, otherGuid]};
+    rooms.push(room);
+    // rooms[i++] = [myGuid, tonyGuid];
+
+    // send to tony to he is starting game
+    const event = {
+        type: 'startGame',
+        roomId: freeRoomId,
+        startTime: new Date().getTime() + 5
+    };
+
+    guidToSocket.get(otherGuid).send(JSON.stringify(event));
+    guidToSocket.get(myGuid).send(JSON.stringify(event));
+}
+
+function checkExistingGuid(guidToSocket, guid) {
+    return guidToSocket.has(guid);
 }
