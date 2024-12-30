@@ -13,42 +13,9 @@
     <div id="messages"></div>
 
     <script>
-        document.querySelector('#mybut').addEventListener('click', sendMessage);
+        // document.querySelector('#mybut').addEventListener('click', sendMessage);
 
-        // Create WebSocket connection
-        const socket = new WebSocket('ws://localhost:3000');
-
-        // Connection opened
-        socket.addEventListener('open', (event) => {
-            console.log('Connected to server');
-            appendMessage('Connected to server');
-        });
-
-        // Listen for messages
-        socket.addEventListener('message', (event) => {
-            console.log('Message from server:', event.data);
-            appendMessage(event.data);
-        });
-
-        // Handle errors
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error:', event);
-            appendMessage('Error: ' + event);
-        });
-
-        // Send message function
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value;
-            socket.send(message);
-            input.value = '';
-        }
-
-        // Append message to div
-        function appendMessage(message) {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML += `<div>${message}</div>`;
-        }
+       
     </script>
   </body>
 </html>
