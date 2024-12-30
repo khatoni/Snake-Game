@@ -17,6 +17,7 @@
       <button id="join-with-guid-button">Join a friend</button>
     </div>
     <div id="messages"></div>
+    <div id="game-board"></div>
     <script>
         // Create WebSocket connection
         const socket = new WebSocket('ws://localhost:3000');
@@ -31,6 +32,23 @@
         socket.addEventListener('message', (event) => {
             console.log('Message from server:', event.data);
             appendMessage(event.data);
+            try {
+              event = JSON.parse(event.data);
+              if(event.type === 'startGame') {
+                const script = document.createElement('script');
+                script.src = '/game-engine.js'; // Path to the other JavaScript file
+                script.async = true;  // Adds async attribute
+                script.defer = true;
+                document.head.appendChild(script);
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/game-styles.css'; // Path to the CSS file
+                document.head.appendChild(link);
+              }
+            }
+            catch(error) {
+
+            }
         });
 
         // Handle errors
@@ -65,6 +83,9 @@
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML += `<div>${message}</div>`;
         }
+
+
+
     </script>
   </body>
 </html>
