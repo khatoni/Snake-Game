@@ -33,21 +33,10 @@
             console.log('Message from server:', event.data);
             appendMessage(event.data);
             try {
-              event = JSON.parse(event.data);
-              if(event.type === 'startGame') {
-                const script = document.createElement('script');
-                script.src = '/game-engine.js'; // Path to the other JavaScript file
-                script.async = true;  // Adds async attribute
-                script.defer = true;
-                document.head.appendChild(script);
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = '/game-styles.css'; // Path to the CSS file
-                document.head.appendChild(link);
-              }
+              startMultiplayerGame(event);
             }
             catch(error) {
-
+              appendMessage(`Unable to start game`);
             }
         });
 
@@ -84,7 +73,21 @@
             messagesDiv.innerHTML += `<div>${message}</div>`;
         }
 
-
+        function startMultiplayerGame(event) {
+            //TODO: implement startime
+            event = JSON.parse(event.data);
+            if(event.type === 'startGame') {
+                const script = document.createElement('script');
+                script.src = '/game-engine.js';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/game-styles.css';
+                document.head.appendChild(link);
+            }
+        }
 
     </script>
   </body>
