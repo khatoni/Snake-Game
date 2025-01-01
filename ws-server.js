@@ -53,6 +53,7 @@ function configureWsServer(server) {
                 let players = rooms[myRoom].guids;
                 let direction = event.direction;
                 const moveEvent = {
+                    name: 'moveSnake',
                     player: myGuid,
                     direction: direction
                 };
