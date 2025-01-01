@@ -26,12 +26,17 @@ function configureWsServer(server) {
         let myRoom = -1;
 
         console.log('Client connected');
-      
-        ws.send('Welcome to the WebSocket server!' + myGuid);
+        const connectionEvent = {
+            name: 'connection',
+            guid: myGuid,
+            message: 'Welcome to the WebSocket server!' + myGuid
+        };
+
+        ws.send(JSON.stringify(connectionEvent));
         ws.on('message', (message) => {
             console.log('Received:', message.toString());
             const event = JSON.parse(message);
-            if (event.type === 'joinMeWith') {
+            if (event.name === 'joinMeWith') {
                 const otherGuid = event.data;
                 if(!checkExistingGuid(guidToSocket, otherGuid)) {
                     ws.send(`There is not such guid existing: ${otherGuid}`);
@@ -41,14 +46,23 @@ function configureWsServer(server) {
                     ws.send(`You cannot enter the same guid`);
                     return;
                 }
-                joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+                myRoom = joinRoom(rooms, guidToSocket, myGuid, otherGuid);
             }
-            // Broadcast to all clients
-            webSocketServer.clients.forEach((client) => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(`Server broadcast: ${message}`);
-                }
-            });
+
+            if(event.name === 'moveSnake') {
+                let players = rooms[myRoom].guids;
+                let direction = event.direction;
+                const moveEvent = {
+                    player: myGuid,
+                    direction: direction
+                };
+                players.forEach((player) => {
+                    if(guidToSocket.get(player).readyState === WebSocket.OPEN) {
+                        guidToSocket.get(player).send(JSON.stringify(moveEvent));
+                    }
+                });
+            }
+
         });
         // priority queue for maximum 20 rooms
         ws.on('joinMeWith', (otherGuid) => {
@@ -62,11 +76,6 @@ function configureWsServer(server) {
             // send to tony to he is starting game
             guidToSocket[tonyGuid].send('startGame', new Date().getTime() + 5);
             guidToSocket[myGuid].send('startGame', new Date().getTime() + 5);
-        });
-
-        ws.on('move', (direction) => {
-            // get my room
-            // rooms[myRoom].sendAll('move', direction);
         });
       
         ws.on('close', () => {
@@ -101,15 +110,39 @@ function joinRoom(rooms, guidToSocket, myGuid, otherGuid) {
 
     // send to tony to he is starting game
     const event = {
-        type: 'startGame',
+        name: 'startGame',
         roomId: freeRoomId,
         startTime: new Date().getTime() + 5
     };
 
     guidToSocket.get(otherGuid).send(JSON.stringify(event));
     guidToSocket.get(myGuid).send(JSON.stringify(event));
+    return rooms.length - 1;
 }
 
 function checkExistingGuid(guidToSocket, guid) {
     return guidToSocket.has(guid);
+}
+
+function generateFoodCoordinates(gameStatePlayer1, gameStatePlayer2) {
+	while(true) {
+		let foodX = Math.round(Math.random() * 20);
+		let foodY = Math.round(Math.random() * 20);
+		if(!gameStatePlayer1[foodX][foodY] && !gameStatePlayer2[foodX][foodY]) {
+			return {x: foodX, y: foodY};
+		}
+	}
+}
+
+function generateFood(roomIndex) {
+    let foodCoordinates = generateFoodCoordinates(gameState1, gameState2);
+    const event = {
+        name: 'generateFood',
+        coordinates: foodCoordinates
+    };
+    rooms[roomIndex].forEach((guid) =>{
+        if(guidToSocket.get(guid).readyState === WebSocket.OPEN) {
+            guidToSocket.get(guid).send(JSON.stringify(event))
+        }
+    });
 }
