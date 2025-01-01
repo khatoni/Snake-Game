@@ -21,7 +21,7 @@
     <script>
         // Create WebSocket connection
         const socket = new WebSocket('ws://localhost:3000');
-
+        let myGuid = "";
         // Connection opened
         socket.addEventListener('open', (event) => {
             console.log('Connected to server');
@@ -30,13 +30,24 @@
 
         // Listen for messages
         socket.addEventListener('message', (event) => {
-            console.log('Message from server:', event.data);
-            appendMessage(event.data);
-            try {
-              startMultiplayerGame(event);
-            }
-            catch(error) {
-              appendMessage(`Unable to start game`);
+            //console.log('Message from server:', event.data);
+            //appendMessage(event.data);
+            event = JSON.parse(event.data);
+            switch(event.name) {
+              case 'connection': 
+                myGuid = event.guid;
+                appendMessage(event.message);
+                break;
+
+              case 'startGame':
+                startMultiplayerGame(socket, event);
+                break;
+              case 'generateFood':
+                generateFood(event);
+                break;
+              case 'moveSnake':
+                moveSnake(event);
+                break;
             }
         });
 
@@ -52,7 +63,7 @@
             const input = document.getElementById('messageInput');
             const message = input.value;
             const customEvent = {
-                type: 'joinMeWith',
+                name: 'joinMeWith',
                 data: message
             };
             socket.send(JSON.stringify(customEvent));
@@ -73,19 +84,41 @@
             messagesDiv.innerHTML += `<div>${message}</div>`;
         }
 
-        function startMultiplayerGame(event) {
+        function startMultiplayerGame(serverSocket, event) {
             //TODO: implement startime
-            event = JSON.parse(event.data);
-            if(event.type === 'startGame') {
+            
+            if(event.name === 'startGame') {
+              console.log('start a game attempt');
                 const script = document.createElement('script');
-                script.src = '/game-engine.js';
-                script.async = true;
+                script.src = '/multiplayer-engine.js';
+                script.async = false;
                 script.defer = true;
+                script.onload = () => {
+                  window.updateSocket(serverSocket);
+                }
                 document.head.appendChild(script);
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = '/game-styles.css';
+                link.href = '/multiplayer-styles.css';
                 document.head.appendChild(link);
+            }
+        }
+
+        function generateFood(event) {
+            
+            if(event.name === 'generateFood') {
+                food = event.coordinates;
+                window.updateFood(food);
+            }
+        }
+
+        function moveSnake(event) {
+            
+            if(event.name === 'moveSnake') {
+                console.log(event);
+                let playerToMove = event.player;
+                let direction = event.direction;
+                playerToMove === myGuid ? window.updateFirstSnakeDirection(direction) : window.updateSecondSnakeDirection(direction);
             }
         }
 
