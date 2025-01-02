@@ -15,12 +15,13 @@ const gameSpeed = 500;
 const snake1 = [];
 const snake2 = [];
 let food = { x: 5, y: 5 };
+// one matrix -> 0 - empty, 1 - me, 2 - other
 var gameState1 = Array.from({ length: 20 }, () => Array(20).fill(0));
 var gameState2 = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
-let direction1 = { x: 1, y: 0 };
-let direction2 = { x:-1, y: 0 };
+let myDirection = { x: 1, y: 0 };
+let otherDirection = { x:-1, y: 0 };
 
 function initialize() {
 	snake1.push({ x : 10, y : 10 });
@@ -30,7 +31,7 @@ function initialize() {
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
-		console.log("Game interval");
+		sendMyDirectionEvent();
 		moveSnake(gameState1, gameState2);
         checkCollision();
 		renderBoard();
@@ -45,63 +46,72 @@ function handleUserInput() {
 	document.addEventListener("keydown", (event) => {
 		switch (event.key) {
 			case "ArrowUp":
-				if(direction1.y === 1) return;
-				direction1 = { x: 0, y: -1 };
+				if(myDirection.y === 1) return;
+				myDirection = { x: 0, y: -1 };
 				break;
 			case "ArrowDown":
-				if(direction1.y === -1) return;
-				direction1 = { x: 0, y: 1 };
+				if(myDirection.y === -1) return;
+				myDirection = { x: 0, y: 1 };
 				break;
 			case "ArrowLeft":
-				if(direction1.x === 1) return;
-				direction1 = { x: -1, y: 0 };
+				if(myDirection.x === 1) return;
+				myDirection = { x: -1, y: 0 };
 				break;
 			case "ArrowRight":
-				if(direction1.x === -1) return;
-				direction1 = { x: 1, y: 0 };
+				if(myDirection.x === -1) return;
+				myDirection = { x: 1, y: 0 };
 				break;
 		}
-
-        const moveEvent = {
-            name: 'moveSnake',
-            direction: direction1
-        };
-
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify(moveEvent));
-            console.log("Move event sent:", moveEvent);
-        } else {
-            console.warn("socket is not connected or ready:", socket?.readyState);
-        }
 	});
 }
 
+function sendMyDirectionEvent() {
+	const moveEvent = {
+		name: 'moveSnake',
+		direction: myDirection
+	};
+
+	if (socket && socket.readyState === WebSocket.OPEN) {
+		socket.send(JSON.stringify(moveEvent));
+		console.log("Move event sent:", moveEvent);
+	} else {
+		console.warn("socket is not connected or ready:", socket?.readyState);
+	}
+}
+
 function moveSnake(gameState1, gameState2) {
-	const head1 = snake1[0];
-	const newHead1 = { x: head1.x + direction1.x, y: head1.y + direction1.y };
-	snake1.unshift(newHead1);
-	gameState1[newHead1.x][newHead1.y] = 1;
-	if(newHead1.x === food.x && newHead1.y === food.y) {
-		// Snake ate the food
-		food = generateFood(gameState1);
-	}
-	else {
-		const tailElement1 = snake1[snake1.length - 1];
-		gameState1[tailElement1.x][tailElement1.y] = 0;
-		snake1.pop();
-	}
-    const head2 = snake2[0];
-	const newHead2 = { x: head2.x + direction2.x, y: head2.y + direction2.y };
-	snake2.unshift(newHead2);
-	gameState2[newHead2.x][newHead2.y] = 1;
-	if(newHead2.x === food.x && newHead2.y === food.y) {
-		// Snake ate the food
-		food = generateFood(gameState2);
-	}
-	else {
-		const tailElement2 = snake2[snake2.length - 1];
-		gameState2[tailElement2.x][tailElement2.y] = 0;
-		snake2.pop();
+	if(!myMoveExecuted) {
+		const head1 = snake1[0];
+		const newHead1 = { x: head1.x + myDirection.x, y: head1.y + myDirection.y };
+		snake1.unshift(newHead1);
+		gameState1[newHead1.x][newHead1.y] = 1;
+		if(newHead1.x === food.x && newHead1.y === food.y) {
+			// Snake ate the food
+			food = generateFood(gameState1);
+		}
+		else {
+			const tailElement1 = snake1[snake1.length - 1];
+			gameState1[tailElement1.x][tailElement1.y] = 0;
+			snake1.pop();
+		}
+		myMoveExecuted = true;
+	} 
+
+	if(!otherMoveExecuted) {
+		const head2 = snake2[0];
+		const newHead2 = { x: head2.x + otherDirection.x, y: head2.y + otherDirection.y };
+		snake2.unshift(newHead2);
+		gameState2[newHead2.x][newHead2.y] = 1;
+		if(newHead2.x === food.x && newHead2.y === food.y) {
+			// Snake ate the food
+			food = generateFood(gameState2);
+		}
+		else {
+			const tailElement2 = snake2[snake2.length - 1];
+			gameState2[tailElement2.x][tailElement2.y] = 0;
+			snake2.pop();
+		}
+		otherMoveExecuted = true;
 	}
 }
 
@@ -232,12 +242,19 @@ function generateFood(event) {
 	}
 }
 
+var myMoveExecuted = true;
+var otherMoveExecuted = true;
+
 function moveEvent(event) {
 	let playerToMove = event.player;
 	let direction = event.direction;
 	if(playerToMove === myGuid) {
-		direction1 = direction;
+		myMoveExecuted = false;
+		myDirection = direction;
 	} else {
-		direction2 = direction;
+		otherMoveExecuted = false;
+		otherDirection = direction;
 	}
+
+	moveSnake(gameState1, gameState2);
 }
