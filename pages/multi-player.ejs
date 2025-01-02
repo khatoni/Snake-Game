@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multi-player Snake Game</title>
+    <script src="/multiplayer-engine.js" async defer></script>
+    <link rel="stylesheet" href="/multiplayer-styles.css" />
   </head>
   <body>
     <h1>Multi-player</h1>
@@ -18,120 +20,5 @@
     </div>
     <div id="messages"></div>
     <div id="game-board"></div>
-    <script>
-        // Create WebSocket connection
-        const socket = new WebSocket('ws://localhost:3000');
-        let myGuid = "";
-        // Connection opened
-        socket.addEventListener('open', (event) => {
-            console.log('Connected to server');
-            appendMessage('Connected to server');
-        });
-
-        // Listen for messages
-        socket.addEventListener('message', (event) => {
-            //console.log('Message from server:', event.data);
-            //appendMessage(event.data);
-            event = JSON.parse(event.data);
-            switch(event.name) {
-              case 'connection': 
-                myGuid = event.guid;
-                appendMessage(event.message);
-                break;
-
-              case 'startGame':
-                startMultiplayerGame(socket, event);
-                break;
-              case 'generateFood':
-                generateFood(event);
-                break;
-              case 'moveSnake':
-                moveSnake(event);
-                break;
-            }
-        });
-
-        // Handle errors
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error:', event);
-            appendMessage('Error: ' + event);
-        });
-
-        const joinWithGuid = document.getElementById('join-with-guid-button');
-        joinWithGuid.addEventListener('click', (event) => {
-            console.log("User clicked join a friend");
-            const input = document.getElementById('messageInput');
-            const message = input.value;
-            const customEvent = {
-                name: 'joinMeWith',
-                data: message
-            };
-            socket.send(JSON.stringify(customEvent));
-            input.value = '';
-        })
-
-        // Send message function
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value;
-            socket.send(message);
-            input.value = '';
-        }
-
-        // Append message to div
-        function appendMessage(message) {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML += `<div>${message}</div>`;
-        }
-
-        function startMultiplayerGame(serverSocket) {
-            //TODO: implement startime
-            
-            console.log('start a game attempt');
-            const script = document.createElement('script');
-            script.src = '/multiplayer-engine.js';
-            script.async = false;
-            script.defer = true;
-            script.onload = () => {
-                window.updateSocket(serverSocket);
-               /* serverSocket.addEventListener('message', (gameEvent) => {
-                    gameEvent = JSON.parse(gameEvent.data);
-                    switch(gameEvent.name) { 
-                      case 'generateFood':
-                        generateFood(gameEvent);
-                        break;
-                      case 'moveSnake':
-                        moveSnake(gameEvent);
-                        break;
-                    }
-                  });*/
-                }
-            document.head.appendChild(script);
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = '/multiplayer-styles.css';
-            document.head.appendChild(link);
-        }
-        
-
-        function generateFood(event) {
-            
-            if(event.name === 'generateFood') {
-                food = event.coordinates;
-                window.updateFood(food);
-            }
-        }
-
-        function moveSnake(event) {
-            
-            if(event.name === 'moveSnake') {
-                console.log('in the function moving the snake');
-                let playerToMove = event.player;
-                let direction = event.direction;
-                playerToMove === myGuid ? window.updateFirstSnakeDirection(direction) : window.updateSecondSnakeDirection(direction);
-            }
-        }
-
-    </script>
   </body>
 </html>

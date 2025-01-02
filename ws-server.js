@@ -19,11 +19,14 @@ function configureWsServer(server) {
     // first sends event => vtoriq guid
     // lobby s id 1: {guid1: 1, guid2: 2}
 
+    // key - user guid
+    // value - room id
+    const guidToRoom = new Map();
+
     webSocketServer.on('connection', (ws) => {
         // create guid and send to client
         const myGuid = createGUID(generatedGUIDS);
-        guidToSocket.set(myGuid,ws);
-        let myRoom = -1;
+        guidToSocket.set(myGuid, ws);
 
         console.log('Client connected');
         const connectionEvent = {
@@ -46,10 +49,14 @@ function configureWsServer(server) {
                     ws.send(`You cannot enter the same guid`);
                     return;
                 }
-                myRoom = joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+
+                const myRoom = joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+                guidToRoom.set(myGuid, myRoom);
+                guidToRoom.set(otherGuid, myRoom);
             }
 
             if(event.name === 'moveSnake') {
+                const myRoom = guidToRoom.get(myGuid);
                 let players = rooms[myRoom].guids;
                 let direction = event.direction;
                 const moveEvent = {
@@ -64,19 +71,6 @@ function configureWsServer(server) {
                 });
             }
 
-        });
-        // priority queue for maximum 20 rooms
-        ws.on('joinMeWith', (otherGuid) => {
-            let freeRoomId = roomsIds.top();
-            roomsIds.pop();
-            let room = {id:freeRoomId, guids:[myGuid, otherGuid]};
-            rooms.push(room);
-            // rooms[i++] = [myGuid, tonyGuid];
-            // myRoom = i - 1;
-
-            // send to tony to he is starting game
-            guidToSocket[tonyGuid].send('startGame', new Date().getTime() + 5);
-            guidToSocket[myGuid].send('startGame', new Date().getTime() + 5);
         });
       
         ws.on('close', () => {

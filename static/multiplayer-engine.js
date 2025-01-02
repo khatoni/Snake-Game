@@ -1,8 +1,16 @@
+
+
+// Create WebSocket connection
+const socket = new WebSocket('ws://localhost:3000');
+
+
+
+
+
+
 const board = document.getElementById("game-board");
 const boardSize = 20;
 const gameSpeed = 500;
-
-var serverSocket;
 
 const snake1 = [];
 const snake2 = [];
@@ -14,9 +22,7 @@ let gameInterval;
 let direction1 = { x: 1, y: 0 };
 let direction2 = { x:-1, y: 0 };
 
-initialize(gameState1, gameState2);
-
-function initialize(gameState1, gameState2) {
+function initialize() {
 	snake1.push({ x : 10, y : 10 });
     snake2.push({ x : 15, y : 10});
 	gameState1[10][10] = 1;
@@ -24,6 +30,7 @@ function initialize(gameState1, gameState2) {
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
+		console.log("Game interval");
 		moveSnake(gameState1, gameState2);
         checkCollision();
 		renderBoard();
@@ -60,11 +67,11 @@ function handleUserInput() {
             direction: direction1
         };
 
-        if (serverSocket && serverSocket.readyState === WebSocket.OPEN) {
-            serverSocket.send(JSON.stringify(moveEvent));
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(moveEvent));
             console.log("Move event sent:", moveEvent);
         } else {
-            console.warn("serverSocket is not connected or ready:", serverSocket?.readyState);
+            console.warn("socket is not connected or ready:", socket?.readyState);
         }
 	});
 }
@@ -151,26 +158,6 @@ function isInsideBoard(position) {
     return position.x >= 1 && position.x <= boardSize && position.y >= 1 && position.y <= boardSize;
 }
 
-window.updateFood = (newFood) => {
-    food = newFood;
-    console.log('Food updated:', food);
-};
-
-window.updateFirstSnakeDirection = (newDirection) => {
-    direction1 = newDirection;
-    console.log('Direction1 changed', direction1);
-}
-
-window.updateSecondSnakeDirection = (newDirection) => {
-    direction2 = newDirection;
-    console.log('Direction1 changed', direction2);
-}
-
-window.updateSocket = (newSocket) => {
-    serverSocket = newSocket;
-}
-
-
 // Assumes that gameState is matrix[20][20]
 //TODO: Bug
 function generateFood(gameState) {
@@ -180,5 +167,77 @@ function generateFood(gameState) {
 		if(!gameState[foodX][foodY]) {
 			return {x: foodX, y: foodY};
 		}
+	}
+}
+
+let myGuid = "";
+// Connection opened
+socket.addEventListener('open', (event) => {
+	appendMessage('Connected to server');
+});
+
+// Listen for messages
+socket.addEventListener('message', (event) => {
+	event = JSON.parse(event.data);
+	switch(event.name) {
+	  case 'connection': 
+		myGuid = event.guid;
+		appendMessage(event.message);
+		break;
+
+	  case 'startGame':
+		initialize();
+		break;
+	  case 'generateFood':
+		generateFood(event);
+		break;
+	  case 'moveSnake':
+		moveEvent(event);
+		break;
+	}
+});
+
+const joinWithGuid = document.getElementById('join-with-guid-button');
+joinWithGuid.addEventListener('click', (event) => {
+	console.log("User clicked join a friend");
+	const input = document.getElementById('messageInput');
+	const message = input.value;
+	const customEvent = {
+		name: 'joinMeWith',
+		data: message
+	};
+	socket.send(JSON.stringify(customEvent));
+	input.value = '';
+})
+
+// Send message function
+function sendMessage() {
+	const input = document.getElementById('messageInput');
+	const message = input.value;
+	socket.send(message);
+	input.value = '';
+}
+
+// Append message to div
+function appendMessage(message) {
+	const messagesDiv = document.getElementById('messages');
+	messagesDiv.innerHTML += `<div>${message}</div>`;
+}
+
+function generateFood(event) {
+	
+	if(event.name === 'generateFood') {
+		food = event.coordinates;
+		window.updateFood(food);
+	}
+}
+
+function moveEvent(event) {
+	let playerToMove = event.player;
+	let direction = event.direction;
+	if(playerToMove === myGuid) {
+		direction1 = direction;
+	} else {
+		direction2 = direction;
 	}
 }
