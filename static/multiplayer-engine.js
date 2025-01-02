@@ -6,14 +6,26 @@ const board = document.getElementById("game-board");
 const boardSize = 20;
 const gameSpeed = 500;
 
+// TODO: players object
+// const players = {};
+// players[myGuid] = {
+// 	direction: { x: 1, y: 0 },
+// 	snake: [],
+// }
+// players[otherGuid] = {};
+
 const snake1 = [];
 const snake2 = [];
 let food = { x: 5, y: 5 };
+
+// TODO: only one gameState
 // one matrix -> 0 - empty, 1 - me, 2 - other
 var gameState1 = Array.from({ length: 20 }, () => Array(20).fill(0));
 var gameState2 = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
+var myMoveExecuted = true;
+var otherMoveExecuted = true;
 let myDirection;
 let otherDirection;
 
@@ -81,6 +93,7 @@ function sendMyDirectionEvent() {
 	}
 }
 
+// TODO: fix function after creating players object
 function moveSnake(gameState1, gameState2) {
 	if(!myMoveExecuted) {
 		const head1 = snake1[0];
@@ -207,6 +220,7 @@ socket.addEventListener('message', (event) => {
 
 const joinWithGuid = document.getElementById('join-with-guid-button');
 joinWithGuid.addEventListener('click', (event) => {
+	// TODO: try again later until the socket loads
 	const input = document.getElementById('messageInput');
 	const message = input.value;
 	const customEvent = {
@@ -230,9 +244,6 @@ function appendMessage(message) {
 	const messagesDiv = document.getElementById('messages');
 	messagesDiv.innerHTML += `<div>${message}</div>`;
 }
-
-var myMoveExecuted = true;
-var otherMoveExecuted = true;
 
 function moveEvent(event) {
 	let playerToMove = event.player;

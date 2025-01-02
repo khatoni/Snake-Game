@@ -37,6 +37,8 @@ function configureWsServer(server) {
         ws.send(JSON.stringify(connectionEvent));
         ws.on('message', (message) => {
             const event = JSON.parse(message);
+
+            // TODO: create object of handlers
             if (event.name === 'joinMeWith') {
                 const otherGuid = event.data;
                 if(!checkExistingGuid(guidToSocket, otherGuid)) {
