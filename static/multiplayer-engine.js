@@ -14,9 +14,9 @@ let gameInterval;
 let direction1 = { x: 1, y: 0 };
 let direction2 = { x:-1, y: 0 };
 
-initialize();
+initialize(gameState1, gameState2);
 
-function initialize() {
+function initialize(gameState1, gameState2) {
 	snake1.push({ x : 10, y : 10 });
     snake2.push({ x : 15, y : 10});
 	gameState1[10][10] = 1;
@@ -24,10 +24,10 @@ function initialize() {
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
-		moveSnake();
+		moveSnake(gameState1, gameState2);
         checkCollision();
 		renderBoard();
-	}, 400);
+	}, 1000);
 }
 
 function endGame() {
@@ -69,7 +69,7 @@ function handleUserInput() {
 	});
 }
 
-function moveSnake() {
+function moveSnake(gameState1, gameState2) {
 	const head1 = snake1[0];
 	const newHead1 = { x: head1.x + direction1.x, y: head1.y + direction1.y };
 	snake1.unshift(newHead1);
@@ -169,6 +169,7 @@ window.updateSecondSnakeDirection = (newDirection) => {
 window.updateSocket = (newSocket) => {
     serverSocket = newSocket;
 }
+
 
 // Assumes that gameState is matrix[20][20]
 //TODO: Bug

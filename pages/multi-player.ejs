@@ -84,25 +84,35 @@
             messagesDiv.innerHTML += `<div>${message}</div>`;
         }
 
-        function startMultiplayerGame(serverSocket, event) {
+        function startMultiplayerGame(serverSocket) {
             //TODO: implement startime
             
-            if(event.name === 'startGame') {
-              console.log('start a game attempt');
-                const script = document.createElement('script');
-                script.src = '/multiplayer-engine.js';
-                script.async = false;
-                script.defer = true;
-                script.onload = () => {
-                  window.updateSocket(serverSocket);
+            console.log('start a game attempt');
+            const script = document.createElement('script');
+            script.src = '/multiplayer-engine.js';
+            script.async = false;
+            script.defer = true;
+            script.onload = () => {
+                window.updateSocket(serverSocket);
+               /* serverSocket.addEventListener('message', (gameEvent) => {
+                    gameEvent = JSON.parse(gameEvent.data);
+                    switch(gameEvent.name) { 
+                      case 'generateFood':
+                        generateFood(gameEvent);
+                        break;
+                      case 'moveSnake':
+                        moveSnake(gameEvent);
+                        break;
+                    }
+                  });*/
                 }
-                document.head.appendChild(script);
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = '/multiplayer-styles.css';
-                document.head.appendChild(link);
-            }
+            document.head.appendChild(script);
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/multiplayer-styles.css';
+            document.head.appendChild(link);
         }
+        
 
         function generateFood(event) {
             
@@ -115,7 +125,7 @@
         function moveSnake(event) {
             
             if(event.name === 'moveSnake') {
-                console.log(event);
+                console.log('in the function moving the snake');
                 let playerToMove = event.player;
                 let direction = event.direction;
                 playerToMove === myGuid ? window.updateFirstSnakeDirection(direction) : window.updateSecondSnakeDirection(direction);
