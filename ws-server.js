@@ -28,7 +28,6 @@ function configureWsServer(server) {
         const myGuid = createGUID(generatedGUIDS);
         guidToSocket.set(myGuid, ws);
 
-        console.log('Client connected');
         const connectionEvent = {
             name: 'connection',
             guid: myGuid,
@@ -37,7 +36,6 @@ function configureWsServer(server) {
 
         ws.send(JSON.stringify(connectionEvent));
         ws.on('message', (message) => {
-            console.log('Received:', message.toString());
             const event = JSON.parse(message);
             if (event.name === 'joinMeWith') {
                 const otherGuid = event.data;
@@ -106,10 +104,22 @@ function joinRoom(rooms, guidToSocket, myGuid, otherGuid) {
     // send to tony to he is starting game
     const event = {
         name: 'startGame',
-        roomId: freeRoomId,
-        startTime: new Date().getTime() + 5
+        data: {
+            roomId: freeRoomId,
+            startTime: new Date().getTime() + 5,
+            players: [myGuid, otherGuid]
+            // guid: { position, direction }
+        }
     };
-
+    event.data[myGuid] = {
+        position: {x: 2, y: 2},
+        direction: {x: 1, y: 0}
+    }
+    event.data[otherGuid] = {
+        position: {x: 18, y: 18},
+        direction: {x: -1, y: 0}
+    };
+    
     guidToSocket.get(otherGuid).send(JSON.stringify(event));
     guidToSocket.get(myGuid).send(JSON.stringify(event));
     return rooms.length - 1;

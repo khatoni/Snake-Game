@@ -1,12 +1,6 @@
-
-
 // Create WebSocket connection
 const socket = new WebSocket('ws://localhost:3000');
-
-
-
-
-
+// TODO: socket.onopen !!!
 
 const board = document.getElementById("game-board");
 const boardSize = 20;
@@ -20,14 +14,22 @@ var gameState1 = Array.from({ length: 20 }, () => Array(20).fill(0));
 var gameState2 = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
-let myDirection = { x: 1, y: 0 };
-let otherDirection = { x:-1, y: 0 };
+let myDirection;
+let otherDirection;
 
-function initialize() {
-	snake1.push({ x : 10, y : 10 });
-    snake2.push({ x : 15, y : 10});
-	gameState1[10][10] = 1;
-    gameState2[15][10] = 1;
+let myGuid = "";
+let otherGuid = "";
+
+function initialize(initData) {
+	otherGuid = initData.players.filter(guid => guid !== myGuid)[0];
+
+	myDirection = initData[myGuid].direction;
+	otherDirection = initData[otherGuid].direction;
+
+	snake1.push(initData[myGuid].position);
+	snake2.push(initData[otherGuid].position);
+	gameState1[initData[myGuid].position.x][initData[myGuid].position.y] = 1;
+    gameState2[initData[otherGuid].position.x][initData[otherGuid].position.y] = 1;
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
@@ -180,36 +182,31 @@ function generateFood(gameState) {
 	}
 }
 
-let myGuid = "";
-// Connection opened
-socket.addEventListener('open', (event) => {
-	appendMessage('Connected to server');
-});
+const eventHandlers = {
+	"connection": (event) => {
+		myGuid = event.guid;
+		appendMessage(event.message);
+	},
+	"startGame": (event) => {
+		initialize(event.data);
+	},
+	"generateFood": (event) => {
+		generateFood(event);
+	},
+	"moveSnake": (event) => {
+		moveEvent(event);
+	}
+};
 
 // Listen for messages
 socket.addEventListener('message', (event) => {
 	event = JSON.parse(event.data);
-	switch(event.name) {
-	  case 'connection': 
-		myGuid = event.guid;
-		appendMessage(event.message);
-		break;
-
-	  case 'startGame':
-		initialize();
-		break;
-	  case 'generateFood':
-		generateFood(event);
-		break;
-	  case 'moveSnake':
-		moveEvent(event);
-		break;
-	}
+	const handler = eventHandlers[event.name];
+	handler(event);
 });
 
 const joinWithGuid = document.getElementById('join-with-guid-button');
 joinWithGuid.addEventListener('click', (event) => {
-	console.log("User clicked join a friend");
 	const input = document.getElementById('messageInput');
 	const message = input.value;
 	const customEvent = {
@@ -232,14 +229,6 @@ function sendMessage() {
 function appendMessage(message) {
 	const messagesDiv = document.getElementById('messages');
 	messagesDiv.innerHTML += `<div>${message}</div>`;
-}
-
-function generateFood(event) {
-	
-	if(event.name === 'generateFood') {
-		food = event.coordinates;
-		window.updateFood(food);
-	}
 }
 
 var myMoveExecuted = true;
