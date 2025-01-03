@@ -8,12 +8,8 @@ const gameSpeed = 500;
 
 const players = {};
 
-const snake1 = [];
-const snake2 = [];
 let food = { x: 5, y: 5 };
 
-// TODO: only one gameState
-// one matrix -> 0 - empty, 1 - me, 2 - other
 var gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
@@ -162,7 +158,7 @@ function checkCollision() {
 	}
 
     for (let i = 1; i < players[otherGuid].snake.length; i++) {
-		if (otherSnakeHead.x === players[myGuid].snake[i].x && otherSnakeHead.y === players[myGuid].snake[i].y) {
+		if (otherSnakeHead.x === players[otherGuid].snake[i].x && otherSnakeHead.y === players[otherGuid].snake[i].y) {
 			endGame();
             return;
 		}
@@ -228,10 +224,10 @@ function moveEvent(event) {
 	let direction = event.direction;
 	if(playerToMove === myGuid) {
 		myMoveExecuted = false;
-		myDirection = direction;
+		players[myGuid].direction = direction;
 	} else {
 		otherMoveExecuted = false;
-		otherDirection = direction;
+		players[otherGuid].direction = direction;
 	}
 
 	moveSnake();

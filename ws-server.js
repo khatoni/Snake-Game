@@ -106,16 +106,14 @@ function joinRoom(rooms, guidToSocket, myGuid, otherGuid) {
     let freeRoomId = roomsIds.pop();
     let room = {id:freeRoomId, guids:[myGuid, otherGuid]};
     rooms.push(room);
-    // rooms[i++] = [myGuid, tonyGuid];
-
-    // send to tony to he is starting game
+ 
     const event = {
         name: 'startGame',
         data: {
             roomId: freeRoomId,
             startTime: new Date().getTime() + 5,
             players: [myGuid, otherGuid]
-            // guid: { position, direction }
+
         }
     };
     event.data[myGuid] = {
