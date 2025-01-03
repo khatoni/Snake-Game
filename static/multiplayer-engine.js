@@ -79,6 +79,7 @@ function handleUserInput() {
 function sendMyDirectionEvent() {
 	const moveEvent = {
 		name: 'moveSnake',
+		player: myGuid,
 		direction: players[myGuid].direction
 	};
 

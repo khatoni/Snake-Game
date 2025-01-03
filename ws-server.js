@@ -57,11 +57,12 @@ function configureWsServer(server) {
 
             if(event.name === 'moveSnake') {
                 const myRoom = guidToRoom.get(myGuid);
+                let player = event.player;
                 let players = rooms[myRoom].guids;
                 let direction = event.direction;
                 const moveEvent = {
                     name: 'moveSnake',
-                    player: myGuid,
+                    player: player,
                     direction: direction
                 };
                 players.forEach((player) => {
