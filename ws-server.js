@@ -71,6 +71,11 @@ function configureWsServer(server) {
                 });
             }
 
+            if(event.name === 'generateFood') {
+                let gameState = event.gameState;
+                generateFood(rooms, guidToRoom.get(myGuid), gameState, guidToSocket);
+            }
+
         });
       
         ws.on('close', () => {
@@ -131,23 +136,23 @@ function checkExistingGuid(guidToSocket, guid) {
     return guidToSocket.has(guid);
 }
 
-function generateFoodCoordinates(gameStatePlayer1, gameStatePlayer2) {
+function generateFoodCoordinates(gameState) {
 	while(true) {
 		let foodX = Math.round(Math.random() * 20);
 		let foodY = Math.round(Math.random() * 20);
-		if(!gameStatePlayer1[foodX][foodY] && !gameStatePlayer2[foodX][foodY]) {
+		if(!gameState[foodX][foodY]) {
 			return {x: foodX, y: foodY};
 		}
 	}
 }
 
-function generateFood(roomIndex) {
-    let foodCoordinates = generateFoodCoordinates(gameState1, gameState2);
+function generateFood(rooms, roomIndex, gameState, guidToSocket) {
+    let foodCoordinates = generateFoodCoordinates(gameState);
     const event = {
         name: 'generateFood',
-        coordinates: foodCoordinates
+        food: foodCoordinates
     };
-    rooms[roomIndex].forEach((guid) =>{
+    rooms[roomIndex].guids.forEach((guid) =>{
         if(guidToSocket.get(guid).readyState === WebSocket.OPEN) {
             guidToSocket.get(guid).send(JSON.stringify(event))
         }
