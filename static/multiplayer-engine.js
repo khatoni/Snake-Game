@@ -44,7 +44,9 @@ function initialize(initData) {
 	gameInterval = setInterval(() => {
 		sendMyDirectionEvent();
 		moveSnake(gameState);
-        checkCollision();
+        if(hasCollision()) {
+			endGame();
+		}
 		renderBoard();
 	}, 1000);
 }
@@ -142,28 +144,31 @@ function renderBoard() {
 	board.appendChild(foodElement);
 }
 
-function checkCollision() {
+function hasCollision() {
 	const mySnakeHead = players[myGuid].snake[0];
     const otherSnakeHead = players[otherGuid].snake[0];
 
 	if (!isInsideBoard(mySnakeHead) || !isInsideBoard(otherSnakeHead)) {
-		endGame();
-        return;
+		return true;
 	}
 
 	for (let i = 1; i < players[myGuid].snake.length; i++) {
-		if (mySnakeHead.x === players[myGuid].snake[i].x && mySnakeHead.y === players[myGuid].snake[i].y) {
-			endGame();
-            return;
+		if (isSamePosition(mySnakeHead, players[myGuid].snake[i])) {
+			return true;
 		}
 	}
 
     for (let i = 1; i < players[otherGuid].snake.length; i++) {
-		if (otherSnakeHead.x === players[otherGuid].snake[i].x && otherSnakeHead.y === players[otherGuid].snake[i].y) {
-			endGame();
-            return;
+		if (isSamePosition(otherSnakeHead, players[otherGuid].snake[i])) {
+			return true;
 		}
 	}
+
+	return false;
+}
+
+function isSamePosition(position1, position2) {
+	return position1.x === position2.x && position1.y === position2.y;
 }
 
 function isInsideBoard(position) {
