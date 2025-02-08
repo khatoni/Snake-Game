@@ -35,7 +35,9 @@
     - both players should get end game screen
     - end game screen should have redirect buttons
   - server holds the state synchronized with players state
-    - maybe server should always hold the whole state and send it to the users
+    - maybe server should always hold the whole state
+    - server should send only last move
+    - server should determine end game
   - reconnect logic
     - on reconnect - get the state from the server
   - delay logic
