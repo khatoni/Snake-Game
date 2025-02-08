@@ -1,8 +1,18 @@
 # TODO
 
-- Login, Register, Users
-  - user: username, password
+```js
+// error response object
+{
+  error: {} // map
+}
+```
+
+- Users
+  - model - user: username, password
   - database mongo db + mongoose
+  - login
+  - register - creates user if username is not taken
+  - authenticated middleware - only login and register should be accessed by not authenticated users
 - Random join
 - Host the app
 
