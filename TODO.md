@@ -18,6 +18,7 @@
   - username should be unique!!!
   - should user have unique id?
   - password atleast 8 symbols
+  - hash the password before saving
   - username atleast 3 symbols
   - database mongo db + mongoose
   - login
