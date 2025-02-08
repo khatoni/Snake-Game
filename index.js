@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, '/pages'));
 app.use(express.static(path.resolve('static')));
 
 app.get('/', (req, res) => {
-  res.render('login');
+  res.render('home');
 });
 
 app.get('/pages/single-player', (req, res) => {
