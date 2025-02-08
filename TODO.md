@@ -3,12 +3,14 @@
 ```js
 // error response object
 {
-  error: {} // map
+  error: {
+  "userName": "User name is already taken"
+} // map
 }
 ```
 
 - Users
-  - model - user: username, password
+  - model - user: userName, password
   - database mongo db + mongoose
   - login
   - register - creates user if username is not taken
