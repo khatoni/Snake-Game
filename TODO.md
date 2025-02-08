@@ -1,19 +1,11 @@
 # TODO
 
-```js
-// error response object
-{
-  error: {
-  "userName": "User name is already taken"
-} // map
-}
-```
-- Home page
+- Home page - Georgi
   - remove chat left overs
   - add h1 "Snake game"
   - two buttons below single player, multi-player
 
-- Users
+- Users - Tone
   - model - user: userName, password
   - username should be unique!!!
   - should user have unique id?
@@ -24,12 +16,20 @@
   - login
   - register - creates user if username is not taken
   - authenticated middleware - only login and register should be accessed by not authenticated users
+```js
+// error response object
+{
+  error: {
+  "userName": "User name is already taken"
+} // map
+}
+```
 
-- Random join
+- Random join - Georgi
   - server gives you opponent
   - both players are redirected to multiplayer page
 
-- Host the app
+- Host the app - Georgi
   - heroku
 
 - Game
