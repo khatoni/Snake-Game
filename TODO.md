@@ -11,6 +11,8 @@
 
 - Users
   - model - user: userName, password
+  - username should be unique!!!
+  - should user have unique id?
   - password atleast 8 symbols
   - username atleast 3 symbols
   - database mongo db + mongoose
@@ -28,6 +30,7 @@
 - Game
   - fix end game
     - both players should receive event, currently it only freezes the screen
+    - both players should leave the room on the server and but should not be available for new game
   - show winner
     - both players should get end game screen
     - end game screen should have redirect buttons
