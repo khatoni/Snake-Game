@@ -10,7 +10,6 @@ header {
 
 input {
     outline: none;
-    margin-right: 8px;
     border: 1px solid green;
     border-radius: 4px;
     padding: 5px;
@@ -18,7 +17,7 @@ input {
 
 .button {
     border-radius: 4px;
-    border: 1px solid black;
+    border: 1px solid green;
     background-color: white;
     text-decoration: none;
     padding: 5px;
@@ -28,5 +27,16 @@ input {
 
     &:hover {
         background-color: #f0f0f0;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin-bottom: 16px;
+
+    input{
+        margin-bottom: 16px;
     }
 }
