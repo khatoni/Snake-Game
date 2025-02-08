@@ -48,6 +48,9 @@
   - delay logic
     - in case of delay - get the state from the server
     - always show the latest state to the users - send timestamp with the state
+  - leave room logic
+    - when game ends
+    - when user leaves the page!
 
 Bonus:
   - game settings for single player?
