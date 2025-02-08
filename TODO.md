@@ -1,6 +1,6 @@
 # TODO
 
-- Home page - Georgi
+- **DONE** Home page - Georgi
   - remove chat left overs
   - add h1 "Snake game"
   - two buttons below single player, multi-player
