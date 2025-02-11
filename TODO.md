@@ -25,11 +25,11 @@
 }
 ```
 
-- Random join - Georgi
+- **DONE** Random join - Georgi
   - server gives you opponent
   - both players are redirected to multiplayer page
 
-- Host the app - Georgi
+- **DONE** Host the app - Georgi
   - heroku
 
 - Game
