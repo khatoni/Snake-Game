@@ -32,6 +32,7 @@ let myGuid = "";
 let otherGuid = "";
 
 function initialize(initData) {
+	document.getElementById("messages").innerHTML = "Game started!";
 	players[myGuid] = {
 		direction: {},
 		snake: [],
@@ -244,7 +245,7 @@ function sendMessage() {
 // Append message to div
 function appendMessage(message) {
 	const messagesDiv = document.getElementById("messages");
-	messagesDiv.innerHTML += `<div>${message}</div>`;
+	messagesDiv.innerHTML += `<div>Your guid: ${message}</div>`;
 }
 
 function moveEvent(event) {
@@ -269,3 +270,13 @@ function generateFood(gameState) {
 
 	socket.send(JSON.stringify(foodEvent));
 }
+
+const searchRandomButton = document.getElementById("search-random");
+searchRandomButton.addEventListener("click", (event) => {
+	document.getElementById("join-with-guid").style.display = "none";
+	document.getElementById("messages").innerHTML = "Searching for opponent..."
+	const customEvent = {
+		name: "searchRandom",
+	};
+	socket.send(JSON.stringify(customEvent));
+});

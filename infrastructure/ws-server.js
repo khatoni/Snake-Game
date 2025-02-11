@@ -5,6 +5,9 @@ const roomsIds = new PriorityQueue();
 for(let i = 0; i < 20; i++) {
     roomsIds.push(i);
 }
+
+const searchRandom = new Set();
+
 function configureWsServer(server) {
     const webSocketServer = new WebSocket.Server({ server });
 
@@ -31,7 +34,7 @@ function configureWsServer(server) {
         const connectionEvent = {
             name: 'connection',
             guid: myGuid,
-            message: 'Welcome to the WebSocket server!' + myGuid
+            message: myGuid
         };
 
         ws.send(JSON.stringify(connectionEvent));
@@ -54,8 +57,7 @@ function configureWsServer(server) {
                 guidToRoom.set(myGuid, myRoom);
                 guidToRoom.set(otherGuid, myRoom);
             }
-
-            if(event.name === 'moveSnake') {
+            else if(event.name === 'moveSnake') {
                 const myRoom = guidToRoom.get(myGuid);
                 let player = event.player;
                 let players = rooms[myRoom].guids;
@@ -71,12 +73,30 @@ function configureWsServer(server) {
                     }
                 });
             }
-
-            if(event.name === 'generateFood') {
+            else if(event.name === 'generateFood') {
                 let gameState = event.gameState;
                 generateFood(rooms, guidToRoom.get(myGuid), gameState, guidToSocket);
             }
-
+            else if(event.name === 'searchRandom') {
+                searchRandom.add(myGuid);
+                if(searchRandom.size >= 2) {
+                    searchRandom.delete(myGuid);
+                    let otherGuid = "";
+                    // get some element from set
+                    for(let guid of searchRandom) {
+                        if(guid) {
+                            otherGuid = guid;
+                            break;
+                        }
+                    }
+                    searchRandom.delete(otherGuid);
+                    
+                    const myRoom = joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+                    guidToRoom.set(myGuid, myRoom);
+                    guidToRoom.set(otherGuid, myRoom);
+                    searchRandom.clear();
+                }
+            }
         });
       
         ws.on('close', () => {
@@ -104,6 +124,10 @@ function createGUID(generatedGUIDS) {
 }
 
 function joinRoom(rooms, guidToSocket, myGuid, otherGuid) {
+    if(searchRandom.has(myGuid) || searchRandom.has(otherGuid)) {
+        // TODO: something went completely wrong
+        return;
+    }
     let freeRoomId = roomsIds.pop();
     let room = {id:freeRoomId, guids:[myGuid, otherGuid]};
     rooms.push(room);
