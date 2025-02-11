@@ -25,16 +25,16 @@ loginButton.addEventListener('click', ()=> {
         password: password
     }
 
-    fetch("/login", {
+    fetch("/api/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: data
+        body: JSON.stringify(data)
     })
     .then(response => response.json())
     .then( () => {
-        window.location.href = "http://localhost:3000/home"
+        window.location.href = "/"
     })
     .catch(error => {
         alert("Error during registration.");
