@@ -32,6 +32,10 @@
 - **DONE** Host the app - Georgi
   - heroku
 
+- Server
+  - error handling middleware
+  - logging
+
 - Game
   - fix end game
     - both players should receive event, currently it only freezes the screen
