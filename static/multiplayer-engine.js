@@ -1,5 +1,7 @@
+const domain = window.location.hostname;
+const wsUrl = `ws://${domain}`;
 // Create WebSocket connection
-const socket = new WebSocket('ws://localhost:3000');
+const socket = new WebSocket(wsUrl);
 // TODO: socket.onopen !!!
 
 const board = document.getElementById("game-board");
