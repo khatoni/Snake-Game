@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const path = require("path");
-const configureWsServer = require("./ws-server");
+const configureWsServer = require("./infrastructure/ws-server");
 const authApiRouter = require("./routes/auth");
 const pagesRouter = require("./routes/pages");
 
