@@ -1,5 +1,8 @@
 const domain = window.location.hostname;
-const wsUrl = `ws://${domain}`;
+// prod
+const wsUrl = `wss://${domain}`;
+// local
+// const wsUrl = `ws://${domain}:3000`;
 // Create WebSocket connection
 const socket = new WebSocket(wsUrl);
 // TODO: socket.onopen !!!
@@ -27,9 +30,9 @@ function initialize(initData) {
 	players[myGuid] = {
 		direction: {},
 		snake: [],
-   }
-   
-	otherGuid = initData.players.filter(guid => guid !== myGuid)[0];
+	};
+
+	otherGuid = initData.players.filter((guid) => guid !== myGuid)[0];
 	players[otherGuid] = {
 		direction: {},
 		snake: [],
@@ -39,14 +42,16 @@ function initialize(initData) {
 	players[myGuid].snake.push(initData[myGuid].position);
 	players[otherGuid].snake.push(initData[otherGuid].position);
 	gameState[initData[myGuid].position.x][initData[myGuid].position.y] = 1;
-    gameState[initData[otherGuid].position.x][initData[otherGuid].position.y] = 2;
+	gameState[initData[otherGuid].position.x][
+		initData[otherGuid].position.y
+	] = 2;
 
 	handleUserInput();
 
 	gameInterval = setInterval(() => {
 		sendMyDirectionEvent();
 		moveSnake(gameState);
-        if(hasCollision()) {
+		if (hasCollision()) {
 			endGame();
 		}
 		renderBoard();
@@ -61,19 +66,19 @@ function handleUserInput() {
 	document.addEventListener("keydown", (event) => {
 		switch (event.key) {
 			case "ArrowUp":
-				if(players[myGuid].direction.y === 1) return;
+				if (players[myGuid].direction.y === 1) return;
 				players[myGuid].direction = { x: 0, y: -1 };
 				break;
 			case "ArrowDown":
-				if(players[myGuid].direction.y === -1) return;
+				if (players[myGuid].direction.y === -1) return;
 				players[myGuid].direction = { x: 0, y: 1 };
 				break;
 			case "ArrowLeft":
-				if(players[myGuid].direction.x === 1) return;
+				if (players[myGuid].direction.x === 1) return;
 				players[myGuid].direction = { x: -1, y: 0 };
 				break;
 			case "ArrowRight":
-				if(players[myGuid].direction.x === -1) return;
+				if (players[myGuid].direction.x === -1) return;
 				players[myGuid].direction = { x: 1, y: 0 };
 				break;
 		}
@@ -82,9 +87,9 @@ function handleUserInput() {
 
 function sendMyDirectionEvent() {
 	const moveEvent = {
-		name: 'moveSnake',
+		name: "moveSnake",
 		player: myGuid,
-		direction: players[myGuid].direction
+		direction: players[myGuid].direction,
 	};
 
 	if (socket && socket.readyState === WebSocket.OPEN) {
@@ -96,12 +101,12 @@ function sendMyDirectionEvent() {
 }
 
 function moveSnake() {
-	if(!myMoveExecuted) {
+	if (!myMoveExecuted) {
 		moveSnakeAction(players[myGuid]);
 		myMoveExecuted = true;
-	} 
+	}
 
-	if(!otherMoveExecuted) {
+	if (!otherMoveExecuted) {
 		moveSnakeAction(players[otherGuid]);
 		otherMoveExecuted = true;
 	}
@@ -109,10 +114,15 @@ function moveSnake() {
 
 function moveSnakeAction(player) {
 	const currentSnakeHead = player.snake[0];
-	const newSnakeHead = { x: currentSnakeHead.x + player.direction.x, y: currentSnakeHead.y + player.direction.y };
+	const newSnakeHead = {
+		x: currentSnakeHead.x + player.direction.x,
+		y: currentSnakeHead.y + player.direction.y,
+	};
 	player.snake.unshift(newSnakeHead);
-	player === players[myGuid]? gameState[newSnakeHead.x][newSnakeHead.y] = 1 : gameState[newSnakeHead.x][newSnakeHead.y] = 2;
-	if(newSnakeHead.x === food.x && newSnakeHead.y === food.y) {
+	player === players[myGuid]
+		? (gameState[newSnakeHead.x][newSnakeHead.y] = 1)
+		: (gameState[newSnakeHead.x][newSnakeHead.y] = 2);
+	if (newSnakeHead.x === food.x && newSnakeHead.y === food.y) {
 		generateFood(gameState);
 	} else {
 		const snakeTail = player.snake[player.snake.length - 1];
@@ -131,7 +141,7 @@ function renderBoard() {
 		snakeElement.classList.add(i === 0 ? "snake1-head" : "snake1");
 		board.appendChild(snakeElement);
 	});
-    players[otherGuid].snake.forEach((position, i) => {
+	players[otherGuid].snake.forEach((position, i) => {
 		const snakeElement = document.createElement("div");
 		snakeElement.style.gridColumn = position.x;
 		snakeElement.style.gridRow = position.y;
@@ -148,7 +158,7 @@ function renderBoard() {
 
 function hasCollision() {
 	const mySnakeHead = players[myGuid].snake[0];
-    const otherSnakeHead = players[otherGuid].snake[0];
+	const otherSnakeHead = players[otherGuid].snake[0];
 
 	if (!isInsideBoard(mySnakeHead) || !isInsideBoard(otherSnakeHead)) {
 		return true;
@@ -160,7 +170,7 @@ function hasCollision() {
 		}
 	}
 
-    for (let i = 1; i < players[otherGuid].snake.length; i++) {
+	for (let i = 1; i < players[otherGuid].snake.length; i++) {
 		if (isSamePosition(otherSnakeHead, players[otherGuid].snake[i])) {
 			return true;
 		}
@@ -174,63 +184,68 @@ function isSamePosition(position1, position2) {
 }
 
 function isInsideBoard(position) {
-    return position.x >= 1 && position.x <= boardSize && position.y >= 1 && position.y <= boardSize;
+	return (
+		position.x >= 1 &&
+		position.x <= boardSize &&
+		position.y >= 1 &&
+		position.y <= boardSize
+	);
 }
 
 const eventHandlers = {
-	"connection": (event) => {
+	connection: (event) => {
 		myGuid = event.guid;
 		appendMessage(event.message);
 	},
-	"startGame": (event) => {
+	startGame: (event) => {
 		initialize(event.data);
 	},
-	"generateFood": (event) => {
+	generateFood: (event) => {
 		food = event.food;
 	},
-	"moveSnake": (event) => {
+	moveSnake: (event) => {
 		moveEvent(event);
-	}
+	},
 };
 
 // Listen for messages
-socket.addEventListener('message', (event) => {
+socket.addEventListener("message", (event) => {
 	event = JSON.parse(event.data);
 	const handler = eventHandlers[event.name];
 	handler(event);
 });
 
-const joinWithGuid = document.getElementById('join-with-guid-button');
-joinWithGuid.addEventListener('click', (event) => {
+const joinWithGuid = document.getElementById("join-with-guid-button");
+joinWithGuid.addEventListener("click", (event) => {
 	// TODO: try again later until the socket loads
-	const input = document.getElementById('messageInput');
+	const input = document.getElementById("messageInput");
 	const message = input.value;
 	const customEvent = {
-		name: 'joinMeWith',
-		data: message
+		name: "joinMeWith",
+		data: message,
 	};
 	socket.send(JSON.stringify(customEvent));
-	input.value = '';
-})
+	input.value = "";
+});
 
 // Send message function
 function sendMessage() {
-	const input = document.getElementById('messageInput');
+	const input = document.getElementById("messageInput");
 	const message = input.value;
 	socket.send(message);
-	input.value = '';
+	input.value = "";
 }
 
 // Append message to div
 function appendMessage(message) {
-	const messagesDiv = document.getElementById('messages');
+	const messagesDiv = document.getElementById("messages");
 	messagesDiv.innerHTML += `<div>${message}</div>`;
 }
 
 function moveEvent(event) {
 	let playerToMove = event.player;
 	let direction = event.direction;
-	if(playerToMove === myGuid) {
+	if (playerToMove === myGuid) {
 		myMoveExecuted = false;
 		players[myGuid].direction = direction;
 	} else {
@@ -243,7 +258,7 @@ function moveEvent(event) {
 
 function generateFood(gameState) {
 	const foodEvent = {
-		name: 'generateFood',
+		name: "generateFood",
 		gameState: gameState,
 	};
 
