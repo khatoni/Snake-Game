@@ -1,15 +1,10 @@
-const domain = window.location.hostname;
-
-let wsUrl = "";
-if(domain === "localhost") {
-	// local
-	wsUrl = `ws://${domain}:3000`;
-} else {
-	// prod
-	wsUrl = `wss://${domain}`;
+function getWsUrl() {
+	const domain = window.location.hostname;
+	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
+
 // Create WebSocket connection
-const socket = new WebSocket(wsUrl);
+const socket = new WebSocket(getWsUrl());
 // TODO: socket.onopen !!!
 
 const board = document.getElementById("game-board");
@@ -18,21 +13,25 @@ const gameSpeed = 500;
 
 const players = {};
 
-let food = { x: 5, y: 5 };
+const food = { x: 5, y: 5 };
 
-var gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
+const gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
 
-var myMoveExecuted = true;
-var otherMoveExecuted = true;
-let myDirection;
-let otherDirection;
+let myMoveExecuted = true,
+	otherMoveExecuted = true;
+let myDirection, otherDirection;
 
-let myGuid = "";
-let otherGuid = "";
+let myGuid = "",
+	otherGuid = "";
+
+const messagesDiv = document.getElementById("messages");
+function setMessage(message) {
+	messagesDiv.innerHTML = message;
+}
 
 function initialize(initData) {
-	document.getElementById("messages").innerHTML = "Game started!";
+	setMessage("Game started!");
 	players[myGuid] = {
 		direction: {},
 		snake: [],
@@ -100,7 +99,6 @@ function sendMyDirectionEvent() {
 
 	if (socket && socket.readyState === WebSocket.OPEN) {
 		socket.send(JSON.stringify(moveEvent));
-		console.log("Move event sent:", moveEvent);
 	} else {
 		console.warn("socket is not connected or ready:", socket?.readyState);
 	}
@@ -137,29 +135,29 @@ function moveSnakeAction(player) {
 	}
 }
 
-function renderBoard() {
-	board.innerHTML = "";
-
-	players[myGuid].snake.forEach((position, i) => {
+function renderSnake(snake, player) {
+	snake.forEach((position, i) => {
 		const snakeElement = document.createElement("div");
 		snakeElement.style.gridColumn = position.x;
 		snakeElement.style.gridRow = position.y;
-		snakeElement.classList.add(i === 0 ? "snake1-head" : "snake1");
+		snakeElement.classList.add(i === 0 ? `snake${player}-head` : `snake${player}`);
 		board.appendChild(snakeElement);
 	});
-	players[otherGuid].snake.forEach((position, i) => {
-		const snakeElement = document.createElement("div");
-		snakeElement.style.gridColumn = position.x;
-		snakeElement.style.gridRow = position.y;
-		snakeElement.classList.add(i === 0 ? "snake2-head" : "snake2");
-		board.appendChild(snakeElement);
-	});
+}
 
+function renderFood() {
 	const foodElement = document.createElement("div");
 	foodElement.style.gridColumn = food.x;
 	foodElement.style.gridRow = food.y;
 	foodElement.classList.add("food");
 	board.appendChild(foodElement);
+}
+
+function renderBoard() {
+	board.innerHTML = "";
+	renderSnake(players[myGuid].snake, 1);
+	renderSnake(players[otherGuid].snake, 2);
+	renderFood();
 }
 
 function hasCollision() {
@@ -201,7 +199,7 @@ function isInsideBoard(position) {
 const eventHandlers = {
 	connection: (event) => {
 		myGuid = event.guid;
-		appendMessage(event.message);
+		setMessage(`Your guid: ${event.message}`);
 	},
 	startGame: (event) => {
 		initialize(event.data);
@@ -220,33 +218,6 @@ socket.addEventListener("message", (event) => {
 	const handler = eventHandlers[event.name];
 	handler(event);
 });
-
-const joinWithGuid = document.getElementById("join-with-guid-button");
-joinWithGuid.addEventListener("click", (event) => {
-	// TODO: try again later until the socket loads
-	const input = document.getElementById("messageInput");
-	const message = input.value;
-	const customEvent = {
-		name: "joinMeWith",
-		data: message,
-	};
-	socket.send(JSON.stringify(customEvent));
-	input.value = "";
-});
-
-// Send message function
-function sendMessage() {
-	const input = document.getElementById("messageInput");
-	const message = input.value;
-	socket.send(message);
-	input.value = "";
-}
-
-// Append message to div
-function appendMessage(message) {
-	const messagesDiv = document.getElementById("messages");
-	messagesDiv.innerHTML += `<div>Your guid: ${message}</div>`;
-}
 
 function moveEvent(event) {
 	let playerToMove = event.player;
@@ -271,12 +242,30 @@ function generateFood(gameState) {
 	socket.send(JSON.stringify(foodEvent));
 }
 
-const searchRandomButton = document.getElementById("search-random");
-searchRandomButton.addEventListener("click", (event) => {
-	document.getElementById("join-with-guid").style.display = "none";
-	document.getElementById("messages").innerHTML = "Searching for opponent..."
-	const customEvent = {
-		name: "searchRandom",
-	};
-	socket.send(JSON.stringify(customEvent));
-});
+function registerEvents() {
+	const searchRandomButton = document.getElementById("search-random");
+	searchRandomButton.addEventListener("click", (_) => {
+		document.getElementById("join-with-guid").style.display = "none";
+		setMessage("Searching for opponent...");
+		socket.send(
+			JSON.stringify({
+				name: "searchRandom",
+			})
+		);
+	});
+
+	const joinWithGuid = document.getElementById("join-with-guid-button");
+	joinWithGuid.addEventListener("click", (_) => {
+		// TODO: try again later until the socket loads
+		const input = document.getElementById("messageInput");
+		socket.send(
+			JSON.stringify({
+				name: "joinMeWith",
+				data: input.value,
+			})
+		);
+		input.value = "";
+	});
+}
+
+registerEvents();
