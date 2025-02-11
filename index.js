@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const configureWsServer = require('./ws-server');
+const {register, login} = require('./controllers/user');
 
 const PORT = process.env.PORT || 3000;
 
@@ -33,13 +34,22 @@ app.get('/pages/multi-player', (req, res) => {
   res.render('multi-player');
 });
 
-app.get('/pages/login', (req, res) => {
+app.get('/login', (req, res) => {
   res.render('login');
 })
 
 app.get('/pages/register', (req, res) => {
   res.render('register');
 })
+
+app.post("/login", (req, res) => {
+  try {
+    login(req, res);
+  } catch(error) {
+    console.log(error);
+  }
+})
+
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}. Visit http://localhost:${PORT}`);
