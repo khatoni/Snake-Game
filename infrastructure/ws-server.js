@@ -1,5 +1,6 @@
 const WebSocket = require("ws");
 const PriorityQueue = require("./priority_queue");
+const { v4: uuidv4 } = require('uuid');
 
 const roomsIds = new PriorityQueue();
 for (let i = 0; i < 20; i++) {
@@ -20,7 +21,7 @@ function configureWsServer(server) {
 
 	webSocketServer.on("connection", (ws) => {
 		// create guid and send to client
-		const myGuid = createGUID(generatedGUIDS);
+		const myGuid = uuidv4();
 		guidToSocket.set(myGuid, ws);
 
 		const connectionEvent = {
@@ -50,7 +51,7 @@ function configureWsServer(server) {
 					return;
 				}
 
-				joinRoom(rooms, guidToSocket, myGuid, otherGuid);
+				joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid);
 			} else if (event.name === "moveSnake") {
 				const myRoom = guidToRoom.get(myGuid);
 				let player = event.player;
@@ -103,22 +104,6 @@ function configureWsServer(server) {
 	});
 
 	return webSocketServer;
-}
-
-function createGUID(generatedGUIDS) {
-	const possibleSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	while (true) {
-		let guid = "";
-		for (let i = 0; i < 5; i++) {
-			guid += possibleSymbols.charAt(
-				Math.floor(Math.random() * possibleSymbols.length)
-			);
-		}
-		if (!generatedGUIDS.has(guid)) {
-			generatedGUIDS.add(guid);
-			return guid;
-		}
-	}
 }
 
 function joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid) {

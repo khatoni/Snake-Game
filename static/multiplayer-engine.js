@@ -3,7 +3,6 @@ function getWsUrl() {
 	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
 
-// Create WebSocket connection
 const socket = new WebSocket(getWsUrl());
 // TODO: socket.onopen !!!
 
@@ -13,7 +12,7 @@ const gameSpeed = 500;
 
 const players = {};
 
-const food = { x: 5, y: 5 };
+let food = { x: 5, y: 5 };
 
 const gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
 let gameInterval;
