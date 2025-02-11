@@ -56,6 +56,8 @@
     - when game ends
     - when user leaves the page!
 
+ - Проверка на всичките кейсове относно сокетите!!!
+
 Bonus:
   - game settings for single player?
     - set step time
