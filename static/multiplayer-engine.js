@@ -1,8 +1,13 @@
 const domain = window.location.hostname;
-// prod
-const wsUrl = `wss://${domain}`;
-// local
-// const wsUrl = `ws://${domain}:3000`;
+
+let wsUrl = "";
+if(domain === "localhost") {
+	// local
+	wsUrl = `ws://${domain}:3000`;
+} else {
+	// prod
+	wsUrl = `wss://${domain}`;
+}
 // Create WebSocket connection
 const socket = new WebSocket(wsUrl);
 // TODO: socket.onopen !!!
