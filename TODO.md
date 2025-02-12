@@ -4,8 +4,6 @@
   - remove chat left overs
   - add h1 "Snake game"
   - two buttons below single player, multi-player
-
-- Users - Tone
   - model - user: userName, password
   - username should be unique!!!
   - should user have unique id?
@@ -15,6 +13,8 @@
   - database mongo db + mongoose
   - login
   - register - creates user if username is not taken
+
+- Users - Tone
   - authenticated middleware - only login and register should be accessed by not authenticated users
 ```js
 // error response object
