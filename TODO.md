@@ -36,6 +36,10 @@
   - error handling middleware
   - logging
 
+- display server errors
+- guest access
+- use webpack
+
 - Game
   - fix end game
     - both players should receive event, currently it only freezes the screen
