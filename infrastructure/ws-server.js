@@ -1,11 +1,5 @@
 const WebSocket = require("ws");
-const PriorityQueue = require("./priority_queue");
 const { v4: uuidv4 } = require('uuid');
-
-const roomsIds = new PriorityQueue();
-for (let i = 0; i < 20; i++) {
-	roomsIds.push(i);
-}
 
 const searchRandom = new Set();
 
@@ -107,7 +101,7 @@ function configureWsServer(server) {
 }
 
 function joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid) {
-	let freeRoomId = roomsIds.pop();
+	let freeRoomId = uuidv4();
 	let room = { id: freeRoomId, guids: [myGuid, otherGuid] };
 	rooms.push(room);
 
