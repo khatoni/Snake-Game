@@ -5,23 +5,34 @@ loginButton.addEventListener('click', ()=> {
     const lastName = document.querySelector('#lastName').value;
 
     const username = document.querySelector('#username').value;
-    const password = document.querySelector('#password').value;
+    const password = document.querySelector('#password');
+    const passwordText = password.value;
 
-    if (!username || !password || !firstName || !lastName) {
-        alert("All fields are required");
+    const information = document.createElement("label");
+    information.setAttribute('id', "info");
+
+    if (!username || !passwordText || !firstName || !lastName) {
+        information.textContent = "Username and Password are required";
+        password.insertAdjacentElement('afterend', information);
         return;
     }
 
     if(username.length < 3 || username.length > 30) {
-        alert("Username must be between 3 and 30 symbols!");
+        information.textContent = "Username must be between 3 and 30 symbols!";
+        password.insertAdjacentElement('afterend', information);
+        return;
     }
 
     if(!username.match(/^[A-Za-z0-9 ]+$/)) {
-        alert("Username must consist only of letters, numbers and spaces!");
+        information.textContent = "Username must consist only of letters, numbers and spaces!";
+        password.insertAdjacentElement('afterend', information);
+        return;
     }
 
-    if(password.length < 8) {
-        alert("Password must be at least 8 symbols!");
+    if(passwordText.length < 8) {
+        information.textContent = "Password must be at least 8 symbols!";
+        password.insertAdjacentElement('afterend', information);
+        return;
     }
 
     const data = {
