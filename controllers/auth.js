@@ -1,4 +1,5 @@
 const errorMessages = require("../constants/errorMessages");
+const User = require('../models/user');
 
 const generateToken = (data) => {
 	const token = jwt.sign(data, config.privateKey, { expiresIn: "1h" });
