@@ -32,7 +32,12 @@ const register = async function (req, res) {
 			userId: userObj._id,
 			username: userObj.username,
 		});
-
+		res.cookie('token', token, {
+			httpOnly: true,  
+			secure: true,    
+			sameSite: 'Strict', 
+			maxAge: 60 * 60 * 1000, // 1 hour
+		});
 		return res.status(201).json({
 			token,
 			userId: userObj._id,
@@ -66,9 +71,13 @@ const login = async function (req, res) {
 				userId: user._id,
 				username: user.username,
 			});
-
+			res.cookie('token', token, {
+				httpOnly: true,  
+				secure: true,    
+				sameSite: 'Strict', 
+				maxAge: 60 * 60 * 1000, // 1 hour
+			});
 			return res.status(200).json({
-				token,
 				userId: user._id,
 				username: user.username,
 			});
