@@ -1,6 +1,6 @@
 // const env = process.env.NODE_ENV;
 const env = "development";
-const User = require("../models/user");
+const User = require("../db-models/user");
 const jwt = require("jsonwebtoken");
 const infrConstants = require("../constants/infrastructure");
 const config = require("../config/config")[env];

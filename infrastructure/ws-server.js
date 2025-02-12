@@ -1,17 +1,18 @@
 const WebSocket = require("ws");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
+const Room = require("../models/room");
 
 const searchRandom = new Set();
 
 function configureWsServer(server) {
 	const webSocketServer = new WebSocket.Server({ server });
 
-	const generatedGUIDS = new Set();
+	// key - user guid, value - socket
 	const guidToSocket = new Map();
-	// rooms object = {};
-	// key -> room id, value -> array of guids/sockets
-	const rooms = [];
-	const guidToRoom = new Map();
+	// key - room guid, value - Room
+	const roomGuidToRoom = new Map();
+	// key - user guid, value - room guid
+	const userGuidToRoomGuid = new Map();
 
 	webSocketServer.on("connection", (ws) => {
 		// create guid and send to client
@@ -45,12 +46,18 @@ function configureWsServer(server) {
 					return;
 				}
 
-				joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid);
+				joinRoom(
+					roomGuidToRoom,
+					userGuidToRoomGuid,
+					guidToSocket,
+					myGuid,
+					otherGuid
+				);
 			} else if (event.name === "moveSnake") {
-				const myRoom = guidToRoom.get(myGuid);
-				let player = event.player;
-				let players = rooms[myRoom].guids;
-				let direction = event.direction;
+				const myRoom = userGuidToRoomGuid.get(myGuid);
+				const player = event.player;
+				const players = roomGuidToRoom.get(myRoom).guids;
+				const direction = event.direction;
 				const moveEvent = {
 					name: "moveSnake",
 					player: player,
@@ -68,8 +75,7 @@ function configureWsServer(server) {
 			} else if (event.name === "generateFood") {
 				let gameState = event.gameState;
 				generateFood(
-					rooms,
-					guidToRoom.get(myGuid),
+					roomGuidToRoom.get(userGuidToRoomGuid.get(myGuid)),
 					gameState,
 					guidToSocket
 				);
@@ -87,7 +93,13 @@ function configureWsServer(server) {
 					}
 					searchRandom.delete(otherGuid);
 
-					joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid);
+					joinRoom(
+						roomGuidToRoom,
+						userGuidToRoomGuid,
+						guidToSocket,
+						myGuid,
+						otherGuid
+					);
 				}
 			}
 		});
@@ -100,34 +112,31 @@ function configureWsServer(server) {
 	return webSocketServer;
 }
 
-function joinRoom(rooms, guidToRoom, guidToSocket, myGuid, otherGuid) {
-	let freeRoomId = uuidv4();
-	let room = { id: freeRoomId, guids: [myGuid, otherGuid] };
-	rooms.push(room);
+function joinRoom(
+	roomGuidToRoom,
+	userGuidToRoomGuid,
+	guidToSocket,
+	myGuid,
+	otherGuid
+) {
+	const room = new Room(uuidv4(), [myGuid, otherGuid]);
+	roomGuidToRoom.set(room.id, room);
 
 	const event = {
 		name: "startGame",
 		data: {
-			roomId: freeRoomId,
+			roomId: room.id,
 			startTime: new Date().getTime() + 5,
 			players: [myGuid, otherGuid],
+			...room.data,
 		},
-	};
-	event.data[myGuid] = {
-		position: { x: 2, y: 2 },
-		direction: { x: 1, y: 0 },
-	};
-	event.data[otherGuid] = {
-		position: { x: 18, y: 18 },
-		direction: { x: -1, y: 0 },
 	};
 
 	guidToSocket.get(otherGuid).send(JSON.stringify(event));
 	guidToSocket.get(myGuid).send(JSON.stringify(event));
 
-	const myRoom = rooms.length - 1;
-	guidToRoom.set(myGuid, myRoom);
-	guidToRoom.set(otherGuid, myRoom);
+	userGuidToRoomGuid.set(myGuid, room.id);
+	userGuidToRoomGuid.set(otherGuid, room.id);
 }
 
 function checkExistingGuid(guidToSocket, guid) {
@@ -136,21 +145,21 @@ function checkExistingGuid(guidToSocket, guid) {
 
 function generateFoodCoordinates(gameState) {
 	while (true) {
-		let foodX = Math.round(Math.random() * 20);
-		let foodY = Math.round(Math.random() * 20);
+		const foodX = Math.round(Math.random() * 20);
+		const foodY = Math.round(Math.random() * 20);
 		if (!gameState[foodX][foodY]) {
 			return { x: foodX, y: foodY };
 		}
 	}
 }
 
-function generateFood(rooms, roomIndex, gameState, guidToSocket) {
-	let foodCoordinates = generateFoodCoordinates(gameState);
+function generateFood(room, gameState, guidToSocket) {
+	const foodCoordinates = generateFoodCoordinates(gameState);
 	const event = {
 		name: "generateFood",
 		food: foodCoordinates,
 	};
-	rooms[roomIndex].guids.forEach((guid) => {
+	room.guids.forEach((guid) => {
 		if (guidToSocket.get(guid).readyState === WebSocket.OPEN) {
 			guidToSocket.get(guid).send(JSON.stringify(event));
 		}

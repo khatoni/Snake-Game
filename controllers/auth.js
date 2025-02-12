@@ -1,6 +1,6 @@
 const errorMessages = require("../constants/errorMessages");
 const infrConstants = require("../constants/infrastructure");
-const User = require('../models/user');
+const User = require('../db-models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const env = 'development';
