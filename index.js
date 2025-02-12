@@ -7,6 +7,7 @@ const authApiRouter = require("./routes/auth");
 const pagesRouter = require("./routes/pages");
 const { connectDB } = require("./config/database");
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,16 +21,14 @@ app.use(cors({
     exposedHeaders: 'Authorization'
 }));
 app.use(express.static(path.resolve("static")));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/", pagesRouter);
-app.use("/api/auth", authApiRouter);
+app.use("/auth", authApiRouter);
 
 app.use("*", (req, res) => {
-	res.status(404).json({
-		error: "Route Not Found",
-	});
+	res.redirect("/");
 });
 
 connectDB();

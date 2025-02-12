@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snake Game</title>
-    <link rel="stylesheet" href="/common.css" />
-    <script defer src="/login.js"></script>
-  </head>
-  <body>
-    <h1>Login</h1>
-    <div class="form">
-        <input type="text" id="username" placeholder="Enter username...">
-        <input type="password" id="password" placeholder="Enter password...">
-        <button class="button" id="mybut">Login</button>
-    </div>
-    <div>
-        If you do not have an account <a href="/register" class="button">create account</a> 
-    </div>
-    
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Snake Game</title>
+		<link rel="stylesheet" href="/common.css" />
+		<script defer src="/login.js"></script>
+	</head>
+	<body>
+		<h1>Login</h1>
+		<form class="form" method="post" action="/auth/login">
+			<input
+				type="text"
+				id="username"
+				name="username"
+				placeholder="Enter username..." />
+			<input
+				type="password"
+				id="password"
+				name="password"
+				placeholder="Enter password..." />
+			<button class="button" id="mybut" type="submit">Login</button>
+		</form>
+		<div>
+			If you do not have an account
+			<a href="/auth/register" class="button">create account</a>
+		</div>
+	</body>
 </html>

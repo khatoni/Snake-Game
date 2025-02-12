@@ -1,4 +1,5 @@
 const errorMessages = require("../constants/errorMessages");
+const infrConstants = require("../constants/infrastructure");
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -28,22 +29,11 @@ const register = async function (req, res) {
 		const newUser = new User({ username, password: hashedPassword });
 		const userObj = await newUser.save();
 
-		const token = generateToken({
-			userId: userObj._id,
-			username: userObj.username,
-		});
-		res.cookie('token', token, {
-			httpOnly: true,  
-			secure: true,    
-			sameSite: 'Strict', 
-			maxAge: 60 * 60 * 1000, // 1 hour
-		});
-		return res.status(201).json({
-			token,
-			userId: userObj._id,
-			username: userObj.username,
-		});
+		setTokenCookie(res, userObj);
+
+		return res.redirect('/');
 	} catch (error) {
+		// redirect to same page with temp data
 		console.error(error);
 		return res.status(400).json({
 			error: errorMessages.databaseUpdateError,
@@ -53,9 +43,8 @@ const register = async function (req, res) {
 
 const login = async function (req, res) {
 	const { username, password } = req.body;
-	
+
 	try {
-		
 		const user = await User.findOne({ username });
 
 		if (user === null) {
@@ -67,21 +56,10 @@ const login = async function (req, res) {
 		const status = await bcrypt.compare(password, user.password);
 
 		if (status) {
-			const token = generateToken({
-				userId: user._id,
-				username: user.username,
-			});
-			res.cookie('token', token, {
-				httpOnly: true,  
-				secure: true,    
-				sameSite: 'Strict', 
-				maxAge: 60 * 60 * 1000, // 1 hour
-			});
-			return res.status(200).json({
-				userId: user._id,
-				username: user.username,
-			});
+			setTokenCookie(res, user);
+			return res.redirect('/');
 		} else {
+			// redirect to same page with short-living data
 			return res.status(400).json({
 				error: errorMessages.wrongCredentials,
 			});
@@ -93,6 +71,20 @@ const login = async function (req, res) {
 		});
 	}
 };
+
+const setTokenCookie = function (res, user) {
+	const token = generateToken({
+		userId: user._id,
+		username: user.username,
+	});
+
+	res.cookie(infrConstants.authCookieName, token, {
+		httpOnly: true,  
+		secure: true,    
+		sameSite: 'Strict', 
+		maxAge: 60 * 60 * 1000, // 1 hour
+	});
+}
 
 const validateRequestData = function (username, password, res) {
 	if (!username) {

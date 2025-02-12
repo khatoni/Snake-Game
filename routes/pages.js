@@ -8,14 +8,6 @@ router.get("/", authenticate, async (req, res) => {
 	res.render("home");
 });
 
-router.get("/login", (req, res) => {
-	res.render("login");
-});
-
-router.get("/register", (req, res) => {
-	res.render("register");
-});
-
 router.get("/single-player", authenticate, async (req, res) => {
 	
 	res.render("single-player");

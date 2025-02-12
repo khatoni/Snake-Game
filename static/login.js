@@ -30,32 +30,32 @@ loginButton.addEventListener('click', ()=> {
         return;
     }
 
-    const data = {
-        username: usernameText,
-        password: passwordText
-    }
+    // const data = {
+    //     username: usernameText,
+    //     password: passwordText
+    // }
 
-    fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-    .then( response => {
-        if(response.ok) {
-            window.location.href = "/"
-        }
-        return response;
-    })
-    .then(response => response.json())
-    .then(response => {
-        const error = response.error;
-        information.textContent = error;
-        password.insertAdjacentElement('afterend', information);
-    })
-    .catch(error => {
-        alert("Error during registration.");
-        console.error("Error:", error);
-    });
+    // fetch("/api/auth/login", {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify(data)
+    // })
+    // .then( response => {
+    //     if(response.ok) {
+    //         window.location.href = "/"
+    //     }
+    //     return response;
+    // })
+    // .then(response => response.json())
+    // .then(response => {
+    //     const error = response.error;
+    //     information.textContent = error;
+    //     password.insertAdjacentElement('afterend', information);
+    // })
+    // .catch(error => {
+    //     alert("Error during registration.");
+    //     console.error("Error:", error);
+    // });
 });

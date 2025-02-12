@@ -4,19 +4,27 @@ const router = Router();
 
 const { register, login } = require("../controllers/auth");
 
-router.post("/login", (req, res) => {
+router.get("/login", (req, res) => {
+	res.render("login");
+});
+
+router.get("/register", (req, res) => {
+	res.render("register");
+});
+
+router.post("/login", async (req, res) => {
 	try {
-		login(req, res);
+		await login(req, res);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 	}
 });
 
-router.post("/register", (req, res) => {
+router.post("/register", async (req, res) => {
 	try {
-		register(req, res);
+		await register(req, res);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 	}
 })
 

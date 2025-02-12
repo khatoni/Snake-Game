@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snake Game</title>
-    <link rel="stylesheet" href="/common.css" />
-    <script defer src="/register.js"></script>
-  </head>
-  <body>
-    <h1>Register</h1>
-    <div class="form">
-        <input type="text" id="firstName" placeholder="Enter your first name...">
-        <input type="text" id="lastName" placeholder="Enter your last name...">
-        <input type="text" id="username" placeholder="Enter username...">
-        <input type="password" id="password" placeholder="Enter password...">
-        <button class="button" id="mybut">Register</button>
-    </div>
-        <a class="button" href="/login">Login</a>
-    <div id="messages"></div>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Snake Game</title>
+		<link rel="stylesheet" href="/common.css" />
+		<script defer src="/register.js"></script>
+	</head>
+	<body>
+		<h1>Register</h1>
+		<form class="form" method="post" action="/auth/register">
+			<input
+				type="text"
+				id="firstName"
+				name="firstName"
+				placeholder="Enter your first name..." />
+			<input
+				type="text"
+				id="lastName"
+				name="lastName"
+				placeholder="Enter your last name..." />
+			<input
+				type="text"
+				id="username"
+				name="username"
+				placeholder="Enter username..." />
+			<input
+				type="password"
+				id="password"
+				name="password"
+				placeholder="Enter password..." />
+			<button class="button" id="mybut" type="submit">Register</button>
+		</form>
+		<a class="button" href="/login">Login</a>
+		<div id="messages"></div>
+	</body>
 </html>
