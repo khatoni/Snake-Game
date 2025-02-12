@@ -1,6 +1,6 @@
 // alt shift f
 const { Router } = require("express");
-const {authenticate, verify} = require("../infrastructure/auth")
+const { authenticate } = require("../infrastructure/auth");
 
 const router = Router();
 
@@ -9,7 +9,6 @@ router.get("/", authenticate, async (req, res) => {
 });
 
 router.get("/single-player", authenticate, async (req, res) => {
-	
 	res.render("single-player");
 });
 

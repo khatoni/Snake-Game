@@ -3,6 +3,8 @@ const { Router } = require("express");
 const router = Router();
 
 const { register, login } = require("../controllers/auth");
+const { authenticate } = require("../infrastructure/auth");
+const infrConstants = require("../constants/infrastructure");
 
 router.get("/login", (req, res) => {
 	res.render("login");
@@ -26,6 +28,12 @@ router.post("/register", async (req, res) => {
 	} catch (error) {
 		console.error(error);
 	}
-})
+});
+
+router.post('/logout', authenticate, (req, res) => {
+    res.clearCookie(infrConstants.authCookieName);
+
+    res.redirect(301, '/');
+});
 
 module.exports = router;

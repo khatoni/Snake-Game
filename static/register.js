@@ -1,5 +1,5 @@
 const loginButton = document.querySelector('#mybut');
-loginButton.addEventListener('click', ()=> {
+loginButton.addEventListener('click', (event) => {
 
     const firstName = document.querySelector('#firstName').value;
     const lastName = document.querySelector('#lastName').value;
@@ -14,55 +14,28 @@ loginButton.addEventListener('click', ()=> {
     if (!username || !passwordText || !firstName || !lastName) {
         information.textContent = "Username and Password are required";
         password.insertAdjacentElement('afterend', information);
+        event.preventDefault();
         return;
     }
 
     if(username.length < 3 || username.length > 30) {
         information.textContent = "Username must be between 3 and 30 symbols!";
         password.insertAdjacentElement('afterend', information);
+        event.preventDefault();
         return;
     }
 
     if(!username.match(/^[A-Za-z0-9 ]+$/)) {
         information.textContent = "Username must consist only of letters, numbers and spaces!";
         password.insertAdjacentElement('afterend', information);
+        event.preventDefault();
         return;
     }
 
     if(passwordText.length < 8) {
         information.textContent = "Password must be at least 8 symbols!";
         password.insertAdjacentElement('afterend', information);
+        event.preventDefault();
         return;
     }
-
-    const data = {
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-        password: passwordText
-    }
-
-    // fetch("/api/auth/register", {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(data)
-    // })
-    // .then( response => {
-    //     if(response.ok) {
-    //         window.location.href = "/"
-    //     }
-    //     return response;
-    // })
-    // .then(response => response.json())
-    // .then(response => {
-    //     const error = response.error;
-    //     information.textContent = error;
-    //     password.insertAdjacentElement('afterend', information);
-    // })
-    // .catch(error => {
-    //     alert("Error during registration.");
-    //     console.error("Error:", error);
-    // });
 });

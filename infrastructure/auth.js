@@ -6,11 +6,10 @@ const infrConstants = require("../constants/infrastructure");
 const config = require("../config/config")[env];
 
 const authenticate = (req, res, next) => {
-	debugger;
-    const token = req.cookies[infrConstants.authCookieName];
+	const token = req.cookies[infrConstants.authCookieName];
 
 	if (!token) {
-        return res.redirect("/auth/login");
+		return res.redirect("/auth/login");
 	}
 
 	try {
@@ -20,7 +19,7 @@ const authenticate = (req, res, next) => {
 		req.username = userObj.username;
 		next();
 	} catch (e) {
-        return res.redirect("/auth/login");
+		return res.redirect("/auth/login");
 	}
 };
 
