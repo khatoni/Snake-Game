@@ -36,9 +36,9 @@
   - error handling middleware
   - logging
 
-- display server errors
-- guest access
-- use webpack
+- display server errors - Tone
+- guest access - Tone
+- use webpack - Tone
 
 - Game
   - fix end game
