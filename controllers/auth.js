@@ -48,9 +48,9 @@ const register = async function (req, res) {
 
 const login = async function (req, res) {
 	const { username, password } = req.body;
-	debugger;
+	
 	try {
-		debugger;
+		
 		const user = await User.findOne({ username });
 
 		if (user === null) {
