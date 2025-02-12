@@ -14,7 +14,7 @@
   - login
   - register - creates user if username is not taken
 
-- Users - Tone
+- **DONE** Users - Tone
   - authenticated middleware - only login and register should be accessed by not authenticated users
 ```js
 // error response object
@@ -32,7 +32,7 @@
 - **DONE** Host the app - Georgi
   - heroku
 
-- Server
+- **DONE** Server
   - error handling middleware
   - logging
 
