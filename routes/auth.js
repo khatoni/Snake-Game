@@ -12,4 +12,12 @@ router.post("/login", (req, res) => {
 	}
 });
 
+router.post("/register", (req, res) => {
+	try {
+		register(req, res);
+	} catch (error) {
+		console.log(error);
+	}
+})
+
 module.exports = router;

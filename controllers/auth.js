@@ -1,5 +1,9 @@
 const errorMessages = require("../constants/errorMessages");
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const env = 'development';
+const config = require('../config/config')[env];
 
 const generateToken = (data) => {
 	const token = jwt.sign(data, config.privateKey, { expiresIn: "1h" });
@@ -8,7 +12,6 @@ const generateToken = (data) => {
 
 const register = async function (req, res) {
 	const { username, password } = req.body;
-
 	try {
 		const user = await User.findOne({ username });
 
@@ -45,8 +48,9 @@ const register = async function (req, res) {
 
 const login = async function (req, res) {
 	const { username, password } = req.body;
-
+	debugger;
 	try {
+		debugger;
 		const user = await User.findOne({ username });
 
 		if (user === null) {

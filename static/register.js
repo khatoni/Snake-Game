@@ -39,7 +39,7 @@ loginButton.addEventListener('click', ()=> {
         firstName: firstName,
         lastName: lastName,
         username: username,
-        password: password
+        password: passwordText
     }
 
     fetch("/api/auth/register", {
@@ -49,9 +49,17 @@ loginButton.addEventListener('click', ()=> {
         },
         body: JSON.stringify(data)
     })
+    .then( response => {
+        if(response.ok) {
+            window.location.href = "/"
+        }
+        return response;
+    })
     .then(response => response.json())
-    .then( () => {
-        window.location.href = "/"
+    .then(response => {
+        const error = response.error;
+        information.textContent = error;
+        password.insertAdjacentElement('afterend', information);
     })
     .catch(error => {
         alert("Error during registration.");

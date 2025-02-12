@@ -4,7 +4,7 @@ const path = require("path");
 const configureWsServer = require("./infrastructure/ws-server");
 const authApiRouter = require("./routes/auth");
 const pagesRouter = require("./routes/pages");
-const { connectDB } = require("./config.js/database");
+const { connectDB } = require("./config/database");
 
 const PORT = process.env.PORT || 3000;
 

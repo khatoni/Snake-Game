@@ -34,8 +34,8 @@ loginButton.addEventListener('click', ()=> {
         username: usernameText,
         password: passwordText
     }
-
-    fetch("/login", {
+    
+    fetch("/api/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
