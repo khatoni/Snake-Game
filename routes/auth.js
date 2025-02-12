@@ -10,29 +10,20 @@ router.get("/login", (req, res) => {
 	res.render("login");
 });
 
+router.post("/login", async (req, res) => {
+	await login(req, res);
+});
+
 router.get("/register", (req, res) => {
 	res.render("register");
 });
 
-router.post("/login", async (req, res) => {
-	try {
-		await login(req, res);
-	} catch (error) {
-		console.error(error);
-	}
-});
-
 router.post("/register", async (req, res) => {
-	try {
-		await register(req, res);
-	} catch (error) {
-		console.error(error);
-	}
+	await register(req, res);
 });
 
 router.post('/logout', authenticate, (req, res) => {
     res.clearCookie(infrConstants.authCookieName);
-
     res.redirect(301, '/');
 });
 
