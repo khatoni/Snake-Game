@@ -32,7 +32,7 @@
 - **DONE** Host the app - Georgi
   - heroku
 
-- Server
+- **DONE** Server
   - error handling middleware
   - logging
 
