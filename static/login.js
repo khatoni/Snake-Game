@@ -1,10 +1,12 @@
 const loginButton = document.querySelector('#mybut');
 loginButton.addEventListener('click', (event) => {
+    removeErrors();
     const usernameText = document.querySelector('#username').value;
     const password = document.querySelector("#password");
     const passwordText = password.value;
     const information = document.createElement("label");
     information.setAttribute('id', "info");
+    information.setAttribute('class', "error");
 
     if (!usernameText || !passwordText) {
         information.textContent = "Username and Password are required";
@@ -34,3 +36,10 @@ loginButton.addEventListener('click', (event) => {
         return;
     }
 });
+
+function removeErrors() {
+    const errors = document.querySelectorAll('.error');
+    errors.forEach((element) => {
+        element.remove();
+    })
+}
