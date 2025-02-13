@@ -62,7 +62,7 @@
 
  - Проверка на всичките кейсове относно сокетите!!!
 
-Bonus:
+Bonus: **DONE** - Tone
   - game settings for single player?
     - set step time
     - decrease step time during game
