@@ -26,6 +26,7 @@ function initialize() {
 
 function endGame() {
 	clearInterval(gameInterval);
+	showBanner("GAME OVER");
 }
 
 function handleUserInput() {
@@ -150,4 +151,13 @@ function changeSpeed(newSpeed) {
 			checkCollision();
 			renderBoard();
 		}, newSpeed);
+}
+
+function showBanner(message) {
+	const banner = document.createElement('div');
+	const text = document.createElement('p');
+	text.textContent = message;
+	banner.appendChild(text);
+
+	document.body.prepend(banner);
 }
