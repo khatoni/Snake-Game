@@ -8,18 +8,10 @@ const socket = new WebSocket(getWsUrl());
 
 const board = document.getElementById("game-board");
 const boardSize = 20;
-const gameSpeed = 500;
 
-const players = {};
+const data = {};
 
-let food = { x: 5, y: 5 };
-
-const gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
-let gameInterval;
-
-let myMoveExecuted = true,
-	otherMoveExecuted = true;
-let myDirection, otherDirection;
+let food;
 
 let myGuid = "",
 	otherGuid = "";
@@ -31,69 +23,43 @@ function setMessage(message) {
 
 function initialize(initData) {
 	setMessage("Game started!");
-	players[myGuid] = {
-		direction: {},
-		snake: [],
-	};
-
-	otherGuid = initData.players.filter((guid) => guid !== myGuid)[0];
-	players[otherGuid] = {
-		direction: {},
-		snake: [],
-	};
-	players[myGuid].direction = initData[myGuid].direction;
-	players[otherGuid].direction = initData[otherGuid].direction;
-	players[myGuid].snake.push(initData[myGuid].position);
-	players[otherGuid].snake.push(initData[otherGuid].position);
-	gameState[initData[myGuid].position.x][initData[myGuid].position.y] = 1;
-	gameState[initData[otherGuid].position.x][
-		initData[otherGuid].position.y
-	] = 2;
+	Object.assign(data, initData);
+	otherGuid = data.guids.find((guid) => guid !== myGuid);
+	food = data.food;
+	renderBoard();
 
 	handleUserInput();
-
-	gameInterval = setInterval(() => {
-		sendMyDirectionEvent();
-		moveSnake(gameState);
-		if (hasCollision()) {
-			endGame();
-		}
-		renderBoard();
-	}, 1000);
-}
-
-function endGame() {
-	clearInterval(gameInterval);
 }
 
 function handleUserInput() {
 	document.addEventListener("keydown", (event) => {
 		switch (event.key) {
 			case "ArrowUp":
-				if (players[myGuid].direction.y === 1) return;
-				players[myGuid].direction = { x: 0, y: -1 };
+				if (data[myGuid].direction.y === 1 || data[myGuid].direction.y === -1) return;
+				sendMyDirectionEvent({ x: 0, y: -1 });
 				break;
 			case "ArrowDown":
-				if (players[myGuid].direction.y === -1) return;
-				players[myGuid].direction = { x: 0, y: 1 };
+				if (data[myGuid].direction.y === -1 || data[myGuid].direction.y === 1) return;
+				sendMyDirectionEvent({ x: 0, y: 1 });
 				break;
 			case "ArrowLeft":
-				if (players[myGuid].direction.x === 1) return;
-				players[myGuid].direction = { x: -1, y: 0 };
+				if (data[myGuid].direction.x === 1 || data[myGuid].direction.x === -1) return;
+				sendMyDirectionEvent({ x: -1, y: 0 });
 				break;
 			case "ArrowRight":
-				if (players[myGuid].direction.x === -1) return;
-				players[myGuid].direction = { x: 1, y: 0 };
+				if (data[myGuid].direction.x === -1 || data[myGuid].direction.x === 1) return;
+				sendMyDirectionEvent({ x: 1, y: 0 });
 				break;
 		}
 	});
 }
 
-function sendMyDirectionEvent() {
+function sendMyDirectionEvent(direction) {
+	// TODO: debounce 200ms
 	const moveEvent = {
 		name: "moveSnake",
 		player: myGuid,
-		direction: players[myGuid].direction,
+		direction: direction,
 	};
 
 	if (socket && socket.readyState === WebSocket.OPEN) {
@@ -103,16 +69,11 @@ function sendMyDirectionEvent() {
 	}
 }
 
-function moveSnake() {
-	if (!myMoveExecuted) {
-		moveSnakeAction(players[myGuid]);
-		myMoveExecuted = true;
-	}
-
-	if (!otherMoveExecuted) {
-		moveSnakeAction(players[otherGuid]);
-		otherMoveExecuted = true;
-	}
+function updateBoard() {
+	moveSnakeAction(data[myGuid]);
+	moveSnakeAction(data[otherGuid]);
+	// TODO: check for food
+	// TODO: check who grows
 }
 
 function moveSnakeAction(player) {
@@ -122,14 +83,9 @@ function moveSnakeAction(player) {
 		y: currentSnakeHead.y + player.direction.y,
 	};
 	player.snake.unshift(newSnakeHead);
-	player === players[myGuid]
-		? (gameState[newSnakeHead.x][newSnakeHead.y] = 1)
-		: (gameState[newSnakeHead.x][newSnakeHead.y] = 2);
 	if (newSnakeHead.x === food.x && newSnakeHead.y === food.y) {
-		generateFood(gameState);
+
 	} else {
-		const snakeTail = player.snake[player.snake.length - 1];
-		gameState[snakeTail.x][snakeTail.y] = 0;
 		player.snake.pop();
 	}
 }
@@ -154,45 +110,9 @@ function renderFood() {
 
 function renderBoard() {
 	board.innerHTML = "";
-	renderSnake(players[myGuid].snake, 1);
-	renderSnake(players[otherGuid].snake, 2);
+	renderSnake(data[myGuid].snake, 1);
+	renderSnake(data[otherGuid].snake, 2);
 	renderFood();
-}
-
-function hasCollision() {
-	const mySnakeHead = players[myGuid].snake[0];
-	const otherSnakeHead = players[otherGuid].snake[0];
-
-	if (!isInsideBoard(mySnakeHead) || !isInsideBoard(otherSnakeHead)) {
-		return true;
-	}
-
-	for (let i = 1; i < players[myGuid].snake.length; i++) {
-		if (isSamePosition(mySnakeHead, players[myGuid].snake[i])) {
-			return true;
-		}
-	}
-
-	for (let i = 1; i < players[otherGuid].snake.length; i++) {
-		if (isSamePosition(otherSnakeHead, players[otherGuid].snake[i])) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-function isSamePosition(position1, position2) {
-	return position1.x === position2.x && position1.y === position2.y;
-}
-
-function isInsideBoard(position) {
-	return (
-		position.x >= 1 &&
-		position.x <= boardSize &&
-		position.y >= 1 &&
-		position.y <= boardSize
-	);
 }
 
 const eventHandlers = {
@@ -203,10 +123,7 @@ const eventHandlers = {
 	startGame: (event) => {
 		initialize(event.data);
 	},
-	generateFood: (event) => {
-		food = event.food;
-	},
-	moveSnake: (event) => {
+	update: (event) => {
 		moveEvent(event);
 	},
 	endGame: (event) => {
@@ -223,26 +140,13 @@ socket.addEventListener("message", (event) => {
 });
 
 function moveEvent(event) {
-	let playerToMove = event.player;
-	let direction = event.direction;
-	if (playerToMove === myGuid) {
-		myMoveExecuted = false;
-		players[myGuid].direction = direction;
-	} else {
-		otherMoveExecuted = false;
-		players[otherGuid].direction = direction;
-	}
-
-	moveSnake();
-}
-
-function generateFood(gameState) {
-	const foodEvent = {
-		name: "generateFood",
-		gameState: gameState,
-	};
-
-	socket.send(JSON.stringify(foodEvent));
+	// TODO: handle who grows
+	data[myGuid].direction = event.data[myGuid];
+	data[otherGuid].direction = event.data[otherGuid];
+	updateBoard();
+	food = event.data.newFoodPosition;
+	
+	renderBoard();
 }
 
 function registerEvents() {
@@ -290,7 +194,6 @@ function showBanner(title, message) {
 	banner.appendChild(text);
 
 	document.body.prepend(banner);
-	clearInterval(gameInterval);
 }
 
 registerEvents();

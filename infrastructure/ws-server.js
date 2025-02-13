@@ -1,6 +1,7 @@
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
 const Room = require("../models/room");
+const { GAME_SPEED } = require("./utils");
 
 const searchRandom = new Set();
 
@@ -54,24 +55,9 @@ function configureWsServer(server) {
 					otherGuid
 				);
 			} else if (event.name === "moveSnake") {
-				const myRoom = userGuidToRoomGuid.get(myGuid);
-				const player = event.player;
-				const players = roomGuidToRoom.get(myRoom).guids;
-				const direction = event.direction;
-				const moveEvent = {
-					name: "moveSnake",
-					player: player,
-					direction: direction,
-				};
-				players.forEach((player) => {
-					if (
-						guidToSocket.get(player).readyState === WebSocket.OPEN
-					) {
-						guidToSocket
-							.get(player)
-							.send(JSON.stringify(moveEvent));
-					}
-				});
+				const roomGuid = userGuidToRoomGuid.get(event.player);
+				const room = roomGuidToRoom.get(roomGuid);
+				room.updatePlayer(event.player, event.direction);
 			} else if (event.name === "generateFood") {
 				let gameState = event.gameState;
 				generateFood(
@@ -112,6 +98,25 @@ function configureWsServer(server) {
 	return webSocketServer;
 }
 
+// create room on the server
+// set default positions of players
+// generate food
+// send state of the game to both players
+// bonus: send timestamp for countdown
+
+// player sends move
+// player receives move
+
+// game logic on the server
+// setInterval => every second send update to the players
+// update
+// {
+//  guid1Direction: {x: 1, y: 0},
+//  guid2Direction: {x: -1, y: 0},
+//  newFoodPosition: { x: 5, y: 5 } | undefined,
+//  growGuid: guid1 | guid2 | undefined
+//}
+
 function joinRoom(
 	roomGuidToRoom,
 	userGuidToRoomGuid,
@@ -125,9 +130,6 @@ function joinRoom(
 	const event = {
 		name: "startGame",
 		data: {
-			roomId: room.id,
-			startTime: new Date().getTime() + 5,
-			players: [myGuid, otherGuid],
 			...room.data,
 		},
 	};
@@ -137,6 +139,43 @@ function joinRoom(
 
 	userGuidToRoomGuid.set(myGuid, room.id);
 	userGuidToRoomGuid.set(otherGuid, room.id);
+
+	setTimeout(() => {
+		room.intervalId = setInterval(() => {
+			// update board
+			room.makeMove();
+			if (room.hasCollision()) {
+				clearInterval(room.intervalId);
+
+				const event = {
+					name: "endGame",
+					winnerGuid: otherGuid,
+				};
+				for(let guid of room.guids) {
+					guidToSocket.get(guid).send(JSON.stringify(event));
+				}
+				return;
+			}
+			room.generateFood();
+
+			const event = {
+				name: "update",
+				data: {
+					newFoodPosition: room.data.food,
+				},
+			};
+
+			for(let guid of room.guids) {
+				event.data[guid] = room.data[guid].direction;
+			}
+
+			for(let guid of room.guids) {
+				guidToSocket.get(guid).send(JSON.stringify(event));
+			}
+		}, GAME_SPEED);
+	}, 5000);
+
+	// end game
 }
 
 function checkExistingGuid(guidToSocket, guid) {
