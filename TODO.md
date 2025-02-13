@@ -4,6 +4,8 @@
   - remove chat left overs
   - add h1 "Snake game"
   - two buttons below single player, multi-player
+- **DONE** Users - Tone
+  - authenticated middleware - only login and register should be accessed by not authenticated users
   - model - user: userName, password
   - username should be unique!!!
   - should user have unique id?
@@ -13,9 +15,8 @@
   - database mongo db + mongoose
   - login
   - register - creates user if username is not taken
-
-- **DONE** Users - Tone
-  - authenticated middleware - only login and register should be accessed by not authenticated users
+  - user authentication
+  - display server errors - Tone
 ```js
 // error response object
 {
@@ -35,8 +36,7 @@
 - **DONE** Server
   - error handling middleware
   - logging
-
-- display server errors - Tone
+    
 - guest access - Tone
 - use webpack - Tone
 
