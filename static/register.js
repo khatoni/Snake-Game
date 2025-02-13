@@ -1,6 +1,6 @@
 const loginButton = document.querySelector('#mybut');
 loginButton.addEventListener('click', (event) => {
-
+    removeErrors();
     const firstName = document.querySelector('#firstName').value;
     const lastName = document.querySelector('#lastName').value;
 
@@ -10,6 +10,7 @@ loginButton.addEventListener('click', (event) => {
 
     const information = document.createElement("label");
     information.setAttribute('id', "info");
+    information.setAttribute('class', "error");
 
     if (!username || !passwordText || !firstName || !lastName) {
         information.textContent = "Username and Password are required";
@@ -39,3 +40,10 @@ loginButton.addEventListener('click', (event) => {
         return;
     }
 });
+
+function removeErrors() {
+    const errors = document.querySelectorAll('.error');
+    errors.forEach((element) => {
+        element.remove();
+    })
+}
