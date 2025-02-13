@@ -17,7 +17,7 @@ const register = async function (req, res) {
 		const user = await User.findOne({ username });
 
 		if (user !== null) {
-			return res.status(400).json({
+			return res.status(400).render('register',{
 				error: errorMessages.userExists,
 			});
 		}
@@ -35,7 +35,7 @@ const register = async function (req, res) {
 	} catch (error) {
 		// redirect to same page with temp data
 		console.error(error);
-		return res.status(400).json({
+		return res.status(400).render('register',{
 			error: errorMessages.databaseUpdateError,
 		});
 	}
@@ -48,7 +48,7 @@ const login = async function (req, res) {
 		const user = await User.findOne({ username });
 
 		if (user === null) {
-			return res.status(404).json({
+			return res.status(404).render('login', {
 				error: errorMessages.invalidUsernamePassword,
 			});
 		}
@@ -60,13 +60,13 @@ const login = async function (req, res) {
 			return res.redirect('/');
 		} else {
 			// redirect to same page with short-living data
-			return res.status(400).json({
+			return res.status(400).render('login', {
 				error: errorMessages.wrongCredentials,
 			});
 		}
 	} catch (error) {
 		console.error(error);
-		return res.status(400).json({
+		return res.status(400).render('login', {
 			error: errorMessages.wrongCredentials,
 		});
 	}

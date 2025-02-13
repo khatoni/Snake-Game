@@ -7,7 +7,7 @@ const { authenticate } = require("../infrastructure/auth");
 const infrConstants = require("../constants/infrastructure");
 
 router.get("/login", (req, res) => {
-	res.render("login");
+	res.render("login", {error: null});
 });
 
 router.post("/login", async (req, res) => {
@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/register", (req, res) => {
-	res.render("register");
+	res.render("register", {error: null});
 });
 
 router.post("/register", async (req, res) => {

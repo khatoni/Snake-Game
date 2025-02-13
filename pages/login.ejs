@@ -22,6 +22,9 @@
 				placeholder="Enter password..." />
 			<button class="button" id="mybut" type="submit">Login</button>
 		</form>
+		<% if (error) { %>
+			<p style="color: red; font-weight: bold;"><%= error %></p>
+		<% } %>
 		<div>
 			If you do not have an account
 			<a href="/auth/register" class="button">create account</a>

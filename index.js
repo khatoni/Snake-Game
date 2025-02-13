@@ -25,6 +25,7 @@ app.use(
 		exposedHeaders: "Authorization",
 	})
 );
+app.use(express.json());
 app.use(express.static(path.resolve("static")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
