@@ -2,11 +2,11 @@ const { Router } = require("express");
 
 const router = Router();
 
-const { register, login } = require("../controllers/auth");
-const { authenticate } = require("../infrastructure/auth");
+const { register, login} = require("../controllers/auth");
+const { authenticate, checkLoggedIn } = require("../infrastructure/auth");
 const infrConstants = require("../constants/infrastructure");
 
-router.get("/login", (req, res) => {
+router.get("/login", checkLoggedIn, (req, res) => {
 	res.render("login", {error: null});
 });
 
@@ -14,7 +14,7 @@ router.post("/login", async (req, res) => {
 	await login(req, res);
 });
 
-router.get("/register", (req, res) => {
+router.get("/register", checkLoggedIn, (req, res) => {
 	res.render("register", {error: null});
 });
 

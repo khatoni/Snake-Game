@@ -47,7 +47,25 @@ const verifyToken = async (token) => {
 	}
 };
 
+const checkLoggedIn = function (req, res, next) {
+	const token = req.cookies[infrConstants.authCookieName];
+
+	if (token) {
+		try {
+			const userObj = jwt.verify(token, config.privateKey);
+			req.userId = userObj.userId;
+			req.username = userObj.username;
+			return res.redirect(req.originalUrl);
+		} catch (e) {
+			next();
+		}
+	} else {
+		next();
+	}
+};
+
 module.exports = {
 	authenticate,
 	verifyToken,
+	checkLoggedIn
 };
