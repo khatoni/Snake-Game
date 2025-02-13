@@ -209,6 +209,10 @@ const eventHandlers = {
 	moveSnake: (event) => {
 		moveEvent(event);
 	},
+	endGame: (event) => {
+		const winnerGuid = event.winnerGuid;
+		finish(winnerGuid);
+	}
 };
 
 // Listen for messages
@@ -265,6 +269,28 @@ function registerEvents() {
 		);
 		input.value = "";
 	});
+}
+
+function finish(winnerGuid) {
+	if(winnerGuid == myGuid) {
+		showBanner("Congratulations", "You are the winner");
+	} else {
+		showBanner("Unfortunately", "You lost the game");
+	}
+}
+
+function showBanner(title, message) {
+	const banner = document.createElement('div');
+	const bannerTitle = document.createElement('h1');
+	bannerTitle.textContent = title;
+	const text = document.createElement('p');
+	text.textContent = message;
+
+	banner.appendChild(bannerTitle);
+	banner.appendChild(text);
+
+	document.body.prepend(banner);
+	clearInterval(gameInterval);
 }
 
 registerEvents();
