@@ -1,10 +1,10 @@
 const board = document.getElementById("game-board");
-const boardSize = 20;
+const boardSize = 21;
 const gameSpeed = 500;
 
 const snake = [];
 let food = { x: 5, y: 5 };
-let gameState = Array.from({ length: 20 }, () => Array(20).fill(0));
+let gameState = Array.from({ length: 22 }, () => Array(22).fill(0));
 let gameInterval;
 
 let direction = { x: 1, y: 0 };
@@ -103,7 +103,7 @@ function checkCollision() {
 }
 
 function isInsideBoard(position) {
-    return position.x >= 1 && position.x <= boardSize && position.y >= 1 && position.y <= boardSize;
+    return position.x >= 1 && position.x < boardSize && position.y >= 1 && position.y < boardSize;
 }
 
 // Assumes that gameState is matrix[20][20]
