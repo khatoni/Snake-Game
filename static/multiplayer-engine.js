@@ -152,6 +152,10 @@ function moveEvent(event) {
 function registerEvents() {
 	const searchRandomButton = document.getElementById("search-random");
 	searchRandomButton.addEventListener("click", (_) => {
+		const banners = document.querySelectorAll('.banner');
+    	banners.forEach((element) => {
+        	element.remove();
+    	});
 		document.getElementById("join-with-guid").style.display = "none";
 		setMessage("Searching for opponent...");
 		socket.send(
@@ -176,6 +180,9 @@ function registerEvents() {
 }
 
 function finish(winnerGuid) {
+	if(winnerGuid === null) {
+		showBanner("GAME OVER", "DRAW");
+	}
 	if(winnerGuid == myGuid) {
 		showBanner("Congratulations", "You are the winner");
 	} else {
@@ -185,6 +192,7 @@ function finish(winnerGuid) {
 
 function showBanner(title, message) {
 	const banner = document.createElement('div');
+	banner.classList.add('banner');
 	const bannerTitle = document.createElement('h1');
 	bannerTitle.textContent = title;
 	const text = document.createElement('p');
