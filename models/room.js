@@ -9,7 +9,7 @@ class Room {
 	}
 
 	#initData() {
-		this.state = Array.from({ length: 20 }, () => Array(20).fill(0));
+		this.state = Array.from({ length: 22 }, () => Array(22).fill(0));
 		this.data = {};
 		this.data[this.guids[0]] = {
             guid: this.guids[0],

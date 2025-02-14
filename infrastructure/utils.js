@@ -1,5 +1,5 @@
 const GAME_SPEED = 500;
-const boardSize = 20;
+const boardSize = 21;
 
 function hasCollision(players, guid1, guid2) {
 	const snakeHeadGuid1 = players[guid1].snake[0];
@@ -53,9 +53,9 @@ function isSamePosition(position1, position2) {
 function isInsideBoard(position) {
 	return (
 		position.x >= 1 &&
-		position.x <= boardSize &&
+		position.x < boardSize &&
 		position.y >= 1 &&
-		position.y <= boardSize
+		position.y < boardSize
 	);
 }
 
