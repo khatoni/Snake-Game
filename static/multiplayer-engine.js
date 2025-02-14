@@ -3,6 +3,11 @@ function getWsUrl() {
 	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
 
+const banners = document.querySelectorAll('.banner');
+banners.forEach((element) => {
+    element.remove();
+});
+
 const socket = new WebSocket(getWsUrl());
 // TODO: socket.onopen !!!
 
