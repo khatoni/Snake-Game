@@ -44,9 +44,12 @@
   - fix end game
     - both players should receive event, currently it only freezes the screen
     - both players should leave the room on the server and but should not be available for new game
-  - show winner
+      
+  **DONE** - Tone
+    - show winner
     - both players should get end game screen
     - end game screen should have redirect buttons
+      
   - server holds the state synchronized with players state
     - maybe server should always hold the whole state
     - server should send only last move
