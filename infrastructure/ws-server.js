@@ -144,12 +144,13 @@ function joinRoom(
 		room.intervalId = setInterval(() => {
 			// update board
 			room.makeMove();
-			if (room.hasCollision()) {
+			let collision = room.hasCollision();
+			if (collision) {
 				clearInterval(room.intervalId);
 
 				const event = {
 					name: "endGame",
-					winnerGuid: otherGuid,
+					winnerGuid: collision.winner,
 				};
 				for(let guid of room.guids) {
 					guidToSocket.get(guid).send(JSON.stringify(event));

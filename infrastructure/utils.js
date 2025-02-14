@@ -2,22 +2,44 @@ const GAME_SPEED = 500;
 const boardSize = 20;
 
 function hasCollision(players, guid1, guid2) {
-	const mySnakeHead = players[guid1].snake[0];
-	const otherSnakeHead = players[guid2].snake[0];
+	const snakeHeadGuid1 = players[guid1].snake[0];
+	const snakeHeadGuid2 = players[guid2].snake[0];
+	const answer = {};
 
-	if (!isInsideBoard(mySnakeHead) || !isInsideBoard(otherSnakeHead)) {
-		return true;
+	if(isSamePosition(snakeHeadGuid1, snakeHeadGuid2)) {
+		answer.winner = null;
+		return answer;
+	}
+
+	if (!isInsideBoard(snakeHeadGuid1)) {
+		answer.winner = guid2;
+		return answer;
+	}
+
+	if (!isInsideBoard(snakeHeadGuid2)) {
+		answer.winner = guid1;
+		return answer;
 	}
 
 	for (let i = 1; i < players[guid1].snake.length; i++) {
-		if (isSamePosition(mySnakeHead, players[guid1].snake[i])) {
-			return true;
+		if (isSamePosition(snakeHeadGuid1, players[guid1].snake[i])) {
+			answer.winner = guid2;
+			return answer;
+		}
+		if (isSamePosition(snakeHeadGuid2, players[guid1].snake[i])) {
+			answer.winner = guid1;
+			return answer;
 		}
 	}
 
 	for (let i = 1; i < players[guid2].snake.length; i++) {
-		if (isSamePosition(otherSnakeHead, players[guid2].snake[i])) {
-			return true;
+		if (isSamePosition(snakeHeadGuid2, players[guid2].snake[i])) {
+			answer.winner = guid1;
+			return answer;
+		}
+		if (isSamePosition(snakeHeadGuid1, players[guid2].snake[i])) {
+			answer.winner = guid2;
+			return answer;
 		}
 	}
 
