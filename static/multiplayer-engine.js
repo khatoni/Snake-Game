@@ -197,9 +197,14 @@ function showBanner(title, message) {
 	bannerTitle.textContent = title;
 	const text = document.createElement('p');
 	text.textContent = message;
+	text.style.fontSize = '18px';
 
 	banner.appendChild(bannerTitle);
 	banner.appendChild(text);
+
+	banner.style.display = 'flex';
+	banner.style.flexDirection = 'column';
+	banner.style.alignItems = 'center';
 
 	document.body.prepend(banner);
 }

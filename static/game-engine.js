@@ -159,5 +159,8 @@ function showBanner(message) {
 	text.textContent = message;
 	banner.appendChild(text);
 
+	banner.style.display = 'flex';
+	banner.style.justifyContent = 'center'; 
+	banner.style.fontSize = '24px'; 
 	document.body.prepend(banner);
 }
