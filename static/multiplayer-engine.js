@@ -3,8 +3,52 @@ function getWsUrl() {
 	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
 
-const socket = new WebSocket(getWsUrl());
-// TODO: socket.onopen !!!
+let socket;
+let reconnectCount = 0;
+const MAX_RECONNECT_COUNT = 5;
+
+function connectWebSocket() {
+	socket = new WebSocket(getWsUrl());
+	
+	socket.addEventListener("message", (event) => {
+		event = JSON.parse(event.data);
+		const handler = eventHandlers[event.name];
+		handler(event);
+	});
+
+	setInterval(() => {
+		socket.send(JSON.stringify("ping"));
+	}, 10000);
+
+	// window.addEventListener("offline", () => {
+	// 	//tryReconnect();
+	// 	socket.close();
+	// });
+
+	socket.onerror = (event) => {
+		console.error(event);
+		setMessage("Server is not responding");
+	}
+
+	socket.onclose = (event) => {
+		//tryReconnect(event);
+	}
+}
+
+function tryReconnect(event) {
+	if(reconnectCount >= MAX_RECONNECT_COUNT) {
+		console.error(event);
+		setMessage("Server is not responding");
+		return;
+	}
+	reconnectCount++;
+	setTimeout(() => {
+		connectWebSocket();
+	}, 1000);
+}
+
+connectWebSocket();
+
 
 const board = document.getElementById("game-board");
 const boardSize = 20;
@@ -62,11 +106,7 @@ function sendMyDirectionEvent(direction) {
 		direction: direction,
 	};
 
-	if (socket && socket.readyState === WebSocket.OPEN) {
-		socket.send(JSON.stringify(moveEvent));
-	} else {
-		console.warn("socket is not connected or ready:", socket?.readyState);
-	}
+	socket?.send(JSON.stringify(moveEvent));
 }
 
 function updateBoard() {
@@ -132,13 +172,6 @@ const eventHandlers = {
 	}
 };
 
-// Listen for messages
-socket.addEventListener("message", (event) => {
-	event = JSON.parse(event.data);
-	const handler = eventHandlers[event.name];
-	handler(event);
-});
-
 function moveEvent(event) {
 	// TODO: handle who grows
 	data[myGuid].direction = event.data[myGuid];
@@ -158,7 +191,7 @@ function registerEvents() {
     	});
 		document.getElementById("join-with-guid").style.display = "none";
 		setMessage("Searching for opponent...");
-		socket.send(
+		socket?.send(
 			JSON.stringify({
 				name: "searchRandom",
 			})
@@ -169,7 +202,7 @@ function registerEvents() {
 	joinWithGuid.addEventListener("click", (_) => {
 		// TODO: try again later until the socket loads
 		const input = document.getElementById("messageInput");
-		socket.send(
+		socket?.send(
 			JSON.stringify({
 				name: "joinMeWith",
 				data: input.value,

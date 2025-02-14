@@ -98,25 +98,6 @@ function configureWsServer(server) {
 	return webSocketServer;
 }
 
-// create room on the server
-// set default positions of players
-// generate food
-// send state of the game to both players
-// bonus: send timestamp for countdown
-
-// player sends move
-// player receives move
-
-// game logic on the server
-// setInterval => every second send update to the players
-// update
-// {
-//  guid1Direction: {x: 1, y: 0},
-//  guid2Direction: {x: -1, y: 0},
-//  newFoodPosition: { x: 5, y: 5 } | undefined,
-//  growGuid: guid1 | guid2 | undefined
-//}
-
 function joinRoom(
 	roomGuidToRoom,
 	userGuidToRoomGuid,
