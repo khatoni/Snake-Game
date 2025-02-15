@@ -32,3 +32,8 @@
 .food {
 	background-color: red;
 }
+
+.error {
+	color: red;
+	font-weight: bolder;
+}

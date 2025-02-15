@@ -213,14 +213,7 @@ const eventHandlers = {
 };
 
 function showErrorConnectGuid(errorMessage) {
-	const element = document.querySelector("div#join-with-guid");
-	const errorContainer = document.createElement("div");
-	errorContainer.classList.add("banner");
-	const error = document.createElement("p");
-	error.textContent = errorMessage;
-	error.style.fontSize = "14px";
-	errorContainer.appendChild(error);
-	element.insertAdjacentElement("afterend", errorContainer);
+	document.getElementById("error-messages").textContent = errorMessage;
 }
 
 function moveEvent(event) {
@@ -240,6 +233,7 @@ function registerEvents() {
 			element.remove();
 		});
 		document.getElementById("join-with-guid").style.display = "none";
+		document.getElementById("error-messages").textContent = "";
 		setMessage("Searching for opponent...");
 		socket?.send(
 			JSON.stringify({
@@ -251,6 +245,7 @@ function registerEvents() {
 	const joinWithGuid = document.getElementById("join-with-guid-button");
 	joinWithGuid.addEventListener("click", (_) => {
 		const input = document.getElementById("messageInput");
+		document.getElementById("error-messages").textContent = "";
 		socket?.send(
 			JSON.stringify({
 				name: "joinMeWith",
