@@ -3,6 +3,11 @@ function getWsUrl() {
 	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
 
+const banners = document.querySelectorAll('.banner');
+banners.forEach((element) => {
+	element.remove();
+});
+
 let socket;
 let reconnectCount = 0;
 const MAX_RECONNECT_COUNT = 5;
@@ -169,6 +174,10 @@ const eventHandlers = {
 	endGame: (event) => {
 		const winnerGuid = event.winnerGuid;
 		finish(winnerGuid);
+	},
+	error: (event) => {
+		const errorMessage = event.error;
+		showErrorConnectGuid(errorMessage);
 	}
 };
 
@@ -221,6 +230,17 @@ function finish(winnerGuid) {
 	} else {
 		showBanner("Unfortunately", "You lost the game");
 	}
+}
+
+function showErrorConnectGuid(errorMessage) {
+	const element = document.querySelector('div#join-with-guid');
+	const errorContainer = document.createElement('div');
+	errorContainer.classList.add('banner');
+	const error = document.createElement('p');
+	error.textContent = errorMessage;
+	error.style.fontSize = '14px';
+	errorContainer.appendChild(error);
+	element.insertAdjacentElement('afterend', errorContainer);
 }
 
 function showBanner(title, message) {

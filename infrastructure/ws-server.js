@@ -34,16 +34,17 @@ function configureWsServer(server) {
 			if (event.name === "joinMeWith") {
 				const otherGuid = event.data;
 				if (!checkExistingGuid(guidToSocket, otherGuid)) {
-					ws.send(`There is not such guid existing: ${otherGuid}`);
+					ws.send(JSON.stringify({name: "error", error: `There is not such guid existing: ${otherGuid}`}));
 					return;
 				}
 				if (myGuid === otherGuid) {
-					ws.send(`You cannot enter the same guid`);
+					ws.send(JSON.stringify({name: "error", error: `You cannot enter the same guid as yours`}));
 					return;
 				}
 
 				if (searchRandom.has(otherGuid) || searchRandom.has(myGuid)) {
 					// TODO: decide what to do
+					ws.send(JSON.stringify({name: "error", error: "Error during connection"}));
 					return;
 				}
 
