@@ -1,7 +1,6 @@
-const User = require("../db-models/user");
 const jwt = require("jsonwebtoken");
 const infrConstants = require("../constants/infrastructure");
-const config = require("../config/config")["development"];
+const config = require("../config/config").getConfig();
 
 const redirectToLogin = (res) => {
 	res.clearCookie(infrConstants.authCookieName);

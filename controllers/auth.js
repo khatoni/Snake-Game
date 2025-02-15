@@ -3,7 +3,7 @@ const infrConstants = require("../constants/infrastructure");
 const User = require("../db-models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const config = require("../config/config")["development"];
+const config = require("../config/config").getConfig();
 
 const generateToken = (data) => {
 	return jwt.sign(data, config.privateKey, { expiresIn: "1h" });

@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
 const Room = require("../models/room");
-const { GAME_SPEED, BOARD_SIZE } = require("./utils");
+const { GAME_SPEED } = require("./utils");
 
 // guids searching for random game
 const searchRandom = new Set();
