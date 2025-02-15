@@ -6,6 +6,12 @@ class Room {
 		this.guids = [...guids];
 		this.#initData();
 		this.intervalId = null;
+		this.timeoutId = null;
+	}
+
+	clear() {
+		clearInterval(this.intervalId);
+		clearTimeout(this.timeoutId);
 	}
 
 	#initData() {
