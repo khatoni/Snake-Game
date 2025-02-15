@@ -110,12 +110,10 @@ function isInsideBoard(position) {
 	);
 }
 
-// Assumes that gameState is matrix[20][20]
-//TODO: Bug
 function generateFood(gameState) {
 	while (true) {
-		let foodX = Math.round(Math.random() * 20);
-		let foodY = Math.round(Math.random() * 20);
+		let foodX = Math.round(Math.random() * 20) + 1;
+		let foodY = Math.round(Math.random() * 20) + 1;
 		if (!gameState[foodX][foodY]) {
 			return { x: foodX, y: foodY };
 		}
