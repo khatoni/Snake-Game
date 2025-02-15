@@ -23,7 +23,6 @@ function configureWsServer(server) {
 		const connectionEvent = {
 			name: "connection",
 			guid: myGuid,
-			message: myGuid,
 		};
 
 		ws.send(JSON.stringify(connectionEvent));
@@ -79,12 +78,6 @@ function configureWsServer(server) {
 				const roomGuid = userGuidToRoomGuid.get(event.player);
 				const room = roomGuidToRoom.get(roomGuid);
 				room.updatePlayer(event.player, event.direction);
-			} else if (event.name === "generateFood") {
-				let gameState = event.gameState;
-				generateFood(
-					roomGuidToRoom.get(userGuidToRoomGuid.get(myGuid)),
-					gameState
-				);
 			} else if (event.name === "searchRandom") {
 				searchRandom.add(myGuid);
 				if (searchRandom.size >= 2) {
@@ -190,29 +183,6 @@ function joinRoom(myGuid, otherGuid) {
 
 function checkExistingGuid(guid) {
 	return guidToSocket.has(guid);
-}
-
-function generateFoodCoordinates(gameState) {
-	while (true) {
-		const foodX = Math.round(Math.random() * BOARD_SIZE);
-		const foodY = Math.round(Math.random() * BOARD_SIZE);
-		if (!gameState[foodX][foodY]) {
-			return { x: foodX, y: foodY };
-		}
-	}
-}
-
-function generateFood(room, gameState) {
-	const foodCoordinates = generateFoodCoordinates(gameState);
-	const event = {
-		name: "generateFood",
-		food: foodCoordinates,
-	};
-	room.guids.forEach((guid) => {
-		if (guidToSocket.get(guid).readyState === WebSocket.OPEN) {
-			guidToSocket.get(guid).send(JSON.stringify(event));
-		}
-	});
 }
 
 module.exports = configureWsServer;

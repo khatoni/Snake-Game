@@ -192,7 +192,7 @@ let isPlayingGame = false;
 const eventHandlers = {
 	connection: (event) => {
 		myGuid = event.guid;
-		setMessage(`Your guid: ${event.message}`);
+		setMessage(`Your guid: ${event.guid}`);
 	},
 	startGame: (event) => {
 		initialize(event.data);
