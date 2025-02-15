@@ -1,5 +1,5 @@
 const infrastructure = {
-    authCookieName: "auth-cookie",
+	authCookieName: "auth-cookie",
 };
 
 module.exports = infrastructure;
