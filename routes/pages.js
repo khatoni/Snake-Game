@@ -1,8 +1,6 @@
-// alt shift f
 const { Router } = require("express");
-const { authenticate } = require("../infrastructure/auth");
-
 const router = Router();
+const { authenticate } = require("../infrastructure/auth");
 
 router.get("/", authenticate, async (req, res) => {
 	res.render("home");

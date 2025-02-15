@@ -1,52 +1,52 @@
 body {
 	height: 100vh;
 	margin: 0;
-    padding: 0 16px;
+	padding: 0 16px;
 }
 
 header {
-    margin-bottom: 16px;
+	margin-bottom: 16px;
 }
 
 input {
-    outline: none;
-    border: 1px solid green;
-    border-radius: 4px;
-    padding: 5px;
+	outline: none;
+	border: 1px solid green;
+	border-radius: 4px;
+	padding: 5px;
 }
 
 .button {
-    border-radius: 4px;
-    border: 1px solid green;
-    background-color: white;
-    text-decoration: none;
-    padding: 5px;
-    color: green;
-    cursor: pointer;
-    font-weight: bolder;
+	border-radius: 4px;
+	border: 1px solid green;
+	background-color: white;
+	text-decoration: none;
+	padding: 5px;
+	color: green;
+	cursor: pointer;
+	font-weight: bolder;
 
-    &:hover {
-        background-color: #f0f0f0;
-    }
+	&:hover {
+		background-color: #f0f0f0;
+	}
 }
 
 .container {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .form {
-    display: flex;
-    flex-direction: column;
-    max-width: 400px;
-    margin-bottom: 16px;
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	margin-bottom: 16px;
 
-    input{
-        margin-bottom: 16px;
-    }
+	input {
+		margin-bottom: 16px;
+	}
 }
 
 .error {
-    color: red;
-    margin-bottom: 16px;
-    font-weight: bolder;
+	color: red;
+	margin-bottom: 16px;
+	font-weight: bolder;
 }

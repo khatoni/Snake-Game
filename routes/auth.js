@@ -9,7 +9,7 @@ router.get("/login", checkLoggedIn, (req, res) => {
 	res.render("login", { error: null });
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", checkLoggedIn, async (req, res) => {
 	await login(req, res);
 });
 
@@ -17,7 +17,7 @@ router.get("/register", checkLoggedIn, (req, res) => {
 	res.render("register", { error: null });
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", checkLoggedIn, async (req, res) => {
 	await register(req, res);
 });
 

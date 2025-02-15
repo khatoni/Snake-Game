@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
 const Room = require("../models/room");
-const { GAME_SPEED } = require("./utils");
+const { GAME_SPEED, BOARD_SIZE } = require("./utils");
 
 // guids searching for random game
 const searchRandom = new Set();
@@ -30,25 +30,47 @@ function configureWsServer(server) {
 		ws.on("message", (message) => {
 			const event = JSON.parse(message);
 
-			// TODO: create object of handlers
 			if (event.name === "joinMeWith") {
 				const otherGuid = event.data;
 				if (!checkExistingGuid(otherGuid)) {
-					ws.send(JSON.stringify({name: "error", error: `There is not such guid existing: ${otherGuid}`}));
+					ws.send(
+						JSON.stringify({
+							name: "error",
+							error: `There is not such guid existing: ${otherGuid}`,
+						})
+					);
 					return;
 				}
 				if (myGuid === otherGuid) {
-					ws.send(JSON.stringify({name: "error", error: `You cannot enter the same guid as yours`}));
+					ws.send(
+						JSON.stringify({
+							name: "error",
+							error: `You cannot enter the same guid as yours`,
+						})
+					);
 					return;
 				}
 
 				if (searchRandom.has(otherGuid) || searchRandom.has(myGuid)) {
-					ws.send(JSON.stringify({name: "error", error: "Error during connection"}));
+					ws.send(
+						JSON.stringify({
+							name: "error",
+							error: "One of the players is searching random opponent",
+						})
+					);
 					return;
 				}
 
-				if(userGuidToRoomGuid.has(myGuid) || userGuidToRoomGuid.has(otherGuid)) {
-					// TODO: decide what to do
+				if (
+					userGuidToRoomGuid.has(myGuid) ||
+					userGuidToRoomGuid.has(otherGuid)
+				) {
+					ws.send(
+						JSON.stringify({
+							name: "error",
+							error: "One of the players is already in a game",
+						})
+					);
 					return;
 				}
 
@@ -172,8 +194,8 @@ function checkExistingGuid(guid) {
 
 function generateFoodCoordinates(gameState) {
 	while (true) {
-		const foodX = Math.round(Math.random() * 20);
-		const foodY = Math.round(Math.random() * 20);
+		const foodX = Math.round(Math.random() * BOARD_SIZE);
+		const foodY = Math.round(Math.random() * BOARD_SIZE);
 		if (!gameState[foodX][foodY]) {
 			return { x: foodX, y: foodY };
 		}

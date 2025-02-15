@@ -17,7 +17,10 @@ const app = express();
 const server = http.createServer(app);
 const webSocketServer = configureWsServer(server);
 
+// Connect to database
 connectDB();
+
+// Configure application
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/pages"));
 app.use(

@@ -19,7 +19,7 @@ function initialize() {
 
 	gameInterval = setInterval(() => {
 		moveSnake();
-        checkCollision();
+		checkCollision();
 		renderBoard();
 	}, gameSpeed);
 }
@@ -33,19 +33,19 @@ function handleUserInput() {
 	document.addEventListener("keydown", (event) => {
 		switch (event.key) {
 			case "ArrowUp":
-				if(direction.y === 1) return;
+				if (direction.y === 1) return;
 				direction = { x: 0, y: -1 };
 				break;
 			case "ArrowDown":
-				if(direction.y === -1) return;
+				if (direction.y === -1) return;
 				direction = { x: 0, y: 1 };
 				break;
 			case "ArrowLeft":
-				if(direction.x === 1) return;
+				if (direction.x === 1) return;
 				direction = { x: -1, y: 0 };
 				break;
 			case "ArrowRight":
-				if(direction.x === -1) return;
+				if (direction.x === -1) return;
 				direction = { x: 1, y: 0 };
 				break;
 		}
@@ -57,11 +57,10 @@ function moveSnake() {
 	const newHead = { x: head.x + direction.x, y: head.y + direction.y };
 	snake.unshift(newHead);
 	gameState[newHead.x][newHead.y] = 1;
-	if(newHead.x === food.x && newHead.y === food.y) {
+	if (newHead.x === food.x && newHead.y === food.y) {
 		// Snake ate the food
 		food = generateFood(gameState);
-	}
-	else {
+	} else {
 		const tailElement = snake[snake.length - 1];
 		gameState[tailElement.x][tailElement.y] = 0;
 		snake.pop();
@@ -88,57 +87,68 @@ function renderBoard() {
 
 function checkCollision() {
 	const head = snake[0];
-    
+
 	if (!isInsideBoard(head)) {
 		endGame();
-        return;
+		return;
 	}
 
 	for (let i = 1; i < snake.length; i++) {
 		if (head.x === snake[i].x && head.y === snake[i].y) {
 			endGame();
-            return;
+			return;
 		}
 	}
 }
 
 function isInsideBoard(position) {
-    return position.x >= 1 && position.x < boardSize && position.y >= 1 && position.y < boardSize;
+	return (
+		position.x >= 1 &&
+		position.x < boardSize &&
+		position.y >= 1 &&
+		position.y < boardSize
+	);
 }
 
 // Assumes that gameState is matrix[20][20]
 //TODO: Bug
 function generateFood(gameState) {
-	while(true) {
+	while (true) {
 		let foodX = Math.round(Math.random() * 20);
 		let foodY = Math.round(Math.random() * 20);
-		if(!gameState[foodX][foodY]) {
-			return {x: foodX, y: foodY};
+		if (!gameState[foodX][foodY]) {
+			return { x: foodX, y: foodY };
 		}
 	}
 }
 
 function visualizeSpeedButton() {
-	const speedSection = document.createElement('div');
-	speedSection.setAttribute('class', 'speed');
-	const label = document.createElement('label');
-	label.textContent = 'Game speed: ';
-	const select = document.createElement('select');
-	select.setAttribute('id', 'speed-select');
+	const speedSection = document.createElement("div");
+	speedSection.setAttribute("class", "speed");
+	const label = document.createElement("label");
+	label.textContent = "Game speed: ";
+	const select = document.createElement("select");
+	select.setAttribute("id", "speed-select");
 
-	const options = [{text:"Slow", value: 400}, {text: "Middle", value: 200}, {text: "Fast", value: 100}];
-	
+	const options = [
+		{ text: "Slow", value: 400 },
+		{ text: "Middle", value: 200 },
+		{ text: "Fast", value: 100 },
+	];
+
 	options.forEach((element) => {
-		const option = document.createElement('option');
+		const option = document.createElement("option");
 		option.value = element.value;
 		option.text = element.text;
 		select.appendChild(option);
 	});
-    
-	speedSection.appendChild(select);
-	document.querySelector('#home').insertAdjacentElement('afterend',speedSection);
 
-	select.addEventListener('change', (event) => {
+	speedSection.appendChild(select);
+	document
+		.querySelector("#home")
+		.insertAdjacentElement("afterend", speedSection);
+
+	select.addEventListener("change", (event) => {
 		const selectedSpeed = event.target.value;
 		changeSpeed(selectedSpeed);
 	});
@@ -146,21 +156,21 @@ function visualizeSpeedButton() {
 
 function changeSpeed(newSpeed) {
 	clearInterval(gameInterval);
-		gameInterval = setInterval(() => {
-			moveSnake();
-			checkCollision();
-			renderBoard();
-		}, newSpeed);
+	gameInterval = setInterval(() => {
+		moveSnake();
+		checkCollision();
+		renderBoard();
+	}, newSpeed);
 }
 
 function showBanner(message) {
-	const banner = document.createElement('div');
-	const text = document.createElement('p');
+	const banner = document.createElement("div");
+	const text = document.createElement("p");
 	text.textContent = message;
 	banner.appendChild(text);
 
-	banner.style.display = 'flex';
-	banner.style.justifyContent = 'center'; 
-	banner.style.fontSize = '24px'; 
+	banner.style.display = "flex";
+	banner.style.justifyContent = "center";
+	banner.style.fontSize = "24px";
 	document.body.prepend(banner);
 }

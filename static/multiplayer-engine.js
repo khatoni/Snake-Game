@@ -3,9 +3,9 @@ function getWsUrl() {
 	return domain === "localhost" ? `ws://${domain}:3000` : `wss://${domain}`;
 }
 
-const banners = document.querySelectorAll('.banner');
+const banners = document.querySelectorAll(".banner");
 banners.forEach((element) => {
-    element.remove();
+	element.remove();
 });
 
 let socket;
@@ -14,16 +14,17 @@ const MAX_RECONNECT_COUNT = 5;
 
 function connectWebSocket() {
 	socket = new WebSocket(getWsUrl());
-	
+
 	socket.addEventListener("message", (event) => {
 		event = JSON.parse(event.data);
 		const handler = eventHandlers[event.name];
 		handler(event);
 	});
 
-	setInterval(() => {
-		socket.send(JSON.stringify("ping"));
-	}, 10000);
+	// ping pong
+	//setInterval(() => {
+	//	socket.send(JSON.stringify("ping"));
+	//}, 10000);
 
 	// window.addEventListener("offline", () => {
 	// 	//tryReconnect();
@@ -33,15 +34,15 @@ function connectWebSocket() {
 	socket.onerror = (event) => {
 		console.error(event);
 		setMessage("Server is not responding");
-	}
+	};
 
 	socket.onclose = (event) => {
 		//tryReconnect(event);
-	}
+	};
 }
 
 function tryReconnect(event) {
-	if(reconnectCount >= MAX_RECONNECT_COUNT) {
+	if (reconnectCount >= MAX_RECONNECT_COUNT) {
 		console.error(event);
 		setMessage("Server is not responding");
 		return;
@@ -53,7 +54,6 @@ function tryReconnect(event) {
 }
 
 connectWebSocket();
-
 
 const board = document.getElementById("game-board");
 const boardSize = 20;
@@ -76,35 +76,62 @@ function initialize(initData) {
 	otherGuid = data.guids.find((guid) => guid !== myGuid);
 	food = data.food;
 	renderBoard();
-
-	handleUserInput();
 }
+
+handleUserInput();
 
 function handleUserInput() {
 	document.addEventListener("keydown", (event) => {
+		if (!isPlayingGame) return;
 		switch (event.key) {
 			case "ArrowUp":
-				if (data[myGuid].direction.y === 1 || data[myGuid].direction.y === -1) return;
-				sendMyDirectionEvent({ x: 0, y: -1 });
+				if (
+					data[myGuid].direction.y === 1 ||
+					data[myGuid].direction.y === -1
+				)
+					return;
+				sendMyDirectionEventDebounced({ x: 0, y: -1 });
 				break;
 			case "ArrowDown":
-				if (data[myGuid].direction.y === -1 || data[myGuid].direction.y === 1) return;
-				sendMyDirectionEvent({ x: 0, y: 1 });
+				if (
+					data[myGuid].direction.y === -1 ||
+					data[myGuid].direction.y === 1
+				)
+					return;
+				sendMyDirectionEventDebounced({ x: 0, y: 1 });
 				break;
 			case "ArrowLeft":
-				if (data[myGuid].direction.x === 1 || data[myGuid].direction.x === -1) return;
-				sendMyDirectionEvent({ x: -1, y: 0 });
+				if (
+					data[myGuid].direction.x === 1 ||
+					data[myGuid].direction.x === -1
+				)
+					return;
+				sendMyDirectionEventDebounced({ x: -1, y: 0 });
 				break;
 			case "ArrowRight":
-				if (data[myGuid].direction.x === -1 || data[myGuid].direction.x === 1) return;
-				sendMyDirectionEvent({ x: 1, y: 0 });
+				if (
+					data[myGuid].direction.x === -1 ||
+					data[myGuid].direction.x === 1
+				)
+					return;
+				sendMyDirectionEventDebounced({ x: 1, y: 0 });
 				break;
 		}
 	});
 }
+function debounce(func, timeout = 200) {
+	let timer;
+	return (...args) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			func.apply(this, args);
+		}, timeout);
+	};
+}
+
+const sendMyDirectionEventDebounced = debounce(sendMyDirectionEvent);
 
 function sendMyDirectionEvent(direction) {
-	// TODO: debounce 200ms
 	const moveEvent = {
 		name: "moveSnake",
 		player: myGuid,
@@ -117,8 +144,6 @@ function sendMyDirectionEvent(direction) {
 function updateBoard() {
 	moveSnakeAction(data[myGuid]);
 	moveSnakeAction(data[otherGuid]);
-	// TODO: check for food
-	// TODO: check who grows
 }
 
 function moveSnakeAction(player) {
@@ -129,7 +154,7 @@ function moveSnakeAction(player) {
 	};
 	player.snake.unshift(newSnakeHead);
 	if (newSnakeHead.x === food.x && newSnakeHead.y === food.y) {
-
+		// you ate the food => you grow
 	} else {
 		player.snake.pop();
 	}
@@ -140,7 +165,9 @@ function renderSnake(snake, player) {
 		const snakeElement = document.createElement("div");
 		snakeElement.style.gridColumn = position.x;
 		snakeElement.style.gridRow = position.y;
-		snakeElement.classList.add(i === 0 ? `snake${player}-head` : `snake${player}`);
+		snakeElement.classList.add(
+			i === 0 ? `snake${player}-head` : `snake${player}`
+		);
 		board.appendChild(snakeElement);
 	});
 }
@@ -160,6 +187,8 @@ function renderBoard() {
 	renderFood();
 }
 
+let isPlayingGame = false;
+
 const eventHandlers = {
 	connection: (event) => {
 		myGuid = event.guid;
@@ -167,6 +196,7 @@ const eventHandlers = {
 	},
 	startGame: (event) => {
 		initialize(event.data);
+		isPlayingGame = true;
 	},
 	update: (event) => {
 		moveEvent(event);
@@ -174,41 +204,41 @@ const eventHandlers = {
 	endGame: (event) => {
 		const winnerGuid = event.winnerGuid;
 		finish(winnerGuid);
+		isPlayingGame = false;
 	},
 	error: (event) => {
 		const errorMessage = event.error;
 		showErrorConnectGuid(errorMessage);
-	}
+	},
 };
 
 function showErrorConnectGuid(errorMessage) {
-	const element = document.querySelector('div#join-with-guid');
-	const errorContainer = document.createElement('div');
-	errorContainer.classList.add('banner');
-	const error = document.createElement('p');
+	const element = document.querySelector("div#join-with-guid");
+	const errorContainer = document.createElement("div");
+	errorContainer.classList.add("banner");
+	const error = document.createElement("p");
 	error.textContent = errorMessage;
-	error.style.fontSize = '14px';
+	error.style.fontSize = "14px";
 	errorContainer.appendChild(error);
-	element.insertAdjacentElement('afterend', errorContainer);
+	element.insertAdjacentElement("afterend", errorContainer);
 }
 
 function moveEvent(event) {
-	// TODO: handle who grows
 	data[myGuid].direction = event.data[myGuid];
 	data[otherGuid].direction = event.data[otherGuid];
 	updateBoard();
 	food = event.data.newFoodPosition;
-	
+
 	renderBoard();
 }
 
 function registerEvents() {
 	const searchRandomButton = document.getElementById("search-random");
 	searchRandomButton.addEventListener("click", (_) => {
-		const banners = document.querySelectorAll('.banner');
-    	banners.forEach((element) => {
-        	element.remove();
-    	});
+		const banners = document.querySelectorAll(".banner");
+		banners.forEach((element) => {
+			element.remove();
+		});
 		document.getElementById("join-with-guid").style.display = "none";
 		setMessage("Searching for opponent...");
 		socket?.send(
@@ -220,7 +250,6 @@ function registerEvents() {
 
 	const joinWithGuid = document.getElementById("join-with-guid-button");
 	joinWithGuid.addEventListener("click", (_) => {
-		// TODO: try again later until the socket loads
 		const input = document.getElementById("messageInput");
 		socket?.send(
 			JSON.stringify({
@@ -233,10 +262,9 @@ function registerEvents() {
 }
 
 function finish(winnerGuid) {
-	if(winnerGuid === null) {
+	if (winnerGuid === null) {
 		showBanner("GAME OVER", "DRAW");
-	}
-	if(winnerGuid == myGuid) {
+	} else if (winnerGuid == myGuid) {
 		showBanner("Congratulations", "You are the winner");
 	} else {
 		showBanner("Unfortunately", "You lost the game");
@@ -244,20 +272,20 @@ function finish(winnerGuid) {
 }
 
 function showBanner(title, message) {
-	const banner = document.createElement('div');
-	banner.classList.add('banner');
-	const bannerTitle = document.createElement('h1');
+	const banner = document.createElement("div");
+	banner.classList.add("banner");
+	const bannerTitle = document.createElement("h1");
 	bannerTitle.textContent = title;
-	const text = document.createElement('p');
+	const text = document.createElement("p");
 	text.textContent = message;
-	text.style.fontSize = '18px';
+	text.style.fontSize = "18px";
 
 	banner.appendChild(bannerTitle);
 	banner.appendChild(text);
 
-	banner.style.display = 'flex';
-	banner.style.flexDirection = 'column';
-	banner.style.alignItems = 'center';
+	banner.style.display = "flex";
+	banner.style.flexDirection = "column";
+	banner.style.alignItems = "center";
 
 	document.body.prepend(banner);
 }
