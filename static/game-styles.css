@@ -18,3 +18,10 @@
 .food {
 	background-color: red;
 }
+
+#info-banner{
+	display: flex;
+	justify-content: space-between;
+	margin: 5px;
+	font-weight: bolder;
+}

@@ -1,6 +1,6 @@
 const board = document.getElementById("game-board");
 const boardSize = 21;
-const gameSpeed = 500;
+const gameSpeed = 400;
 
 const snake = [];
 let food = { x: 5, y: 5 };
@@ -10,12 +10,16 @@ let gameInterval;
 let direction = { x: 1, y: 0 };
 
 initialize();
-visualizeSpeedButton();
 
 function initialize() {
 	snake.push({ x: 10, y: 10 });
 	gameState[10][10] = 1;
 	handleUserInput();
+	const select = document.getElementById("speed-select");
+	select.addEventListener("change", (event) => {
+		const selectedSpeed = event.target.value;
+		changeSpeed(selectedSpeed);
+	});
 
 	gameInterval = setInterval(() => {
 		moveSnake();
@@ -120,38 +124,6 @@ function generateFood(gameState) {
 	}
 }
 
-function visualizeSpeedButton() {
-	const speedSection = document.createElement("div");
-	speedSection.setAttribute("class", "speed");
-	const label = document.createElement("label");
-	label.textContent = "Game speed: ";
-	const select = document.createElement("select");
-	select.setAttribute("id", "speed-select");
-
-	const options = [
-		{ text: "Slow", value: 400 },
-		{ text: "Middle", value: 200 },
-		{ text: "Fast", value: 100 },
-	];
-
-	options.forEach((element) => {
-		const option = document.createElement("option");
-		option.value = element.value;
-		option.text = element.text;
-		select.appendChild(option);
-	});
-
-	speedSection.appendChild(select);
-	document
-		.querySelector("#home")
-		.insertAdjacentElement("afterend", speedSection);
-
-	select.addEventListener("change", (event) => {
-		const selectedSpeed = event.target.value;
-		changeSpeed(selectedSpeed);
-	});
-}
-
 function changeSpeed(newSpeed) {
 	clearInterval(gameInterval);
 	gameInterval = setInterval(() => {
@@ -162,13 +134,6 @@ function changeSpeed(newSpeed) {
 }
 
 function showBanner(message) {
-	const banner = document.createElement("div");
-	const text = document.createElement("p");
-	text.textContent = message;
-	banner.appendChild(text);
-
-	banner.style.display = "flex";
-	banner.style.justifyContent = "center";
-	banner.style.fontSize = "24px";
-	document.body.prepend(banner);
+	const banner = document.getElementById("info-banner");
+	banner.innerText = message;
 }

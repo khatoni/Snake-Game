@@ -13,6 +13,17 @@
     <header>
       <a class="button" id="home" href="/">Home</a>
     </header>
+    <div class="speed">
+      <label>Game speed: </label>
+      <select id="speed-select">
+        <option selected value="400">Slow</option>
+        <option value="200">Medium</option>
+        <option value="100">Fast</option>
+      </select>
+    </div>
+    <div>
+      <p id="info-banner"></p>
+    </div>
     <div id="game-board"></div>
     <div class="container">
       <form class="form" method="post" action="/auth/logout">
