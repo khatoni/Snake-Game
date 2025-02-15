@@ -76,7 +76,13 @@ function configureWsServer(server) {
 				joinRoom(myGuid, otherGuid);
 			} else if (event.name === "moveSnake") {
 				const roomGuid = userGuidToRoomGuid.get(event.player);
+				if(!roomGuid) {
+					return;
+				}
 				const room = roomGuidToRoom.get(roomGuid);
+				if(!room) {
+					return;
+				}
 				room.updatePlayer(event.player, event.direction);
 			} else if (event.name === "searchRandom") {
 				searchRandom.add(myGuid);
