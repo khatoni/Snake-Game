@@ -5,71 +5,6 @@ const { GAME_SPEED } = require("./utils");
 
 const searchRandom = new Set();
 
-const eventHandlers = {
-	joinWith: (event) => {
-		const otherGuid = event.data;
-		if (!checkExistingGuid(guidToSocket, otherGuid)) {
-			ws.send(JSON.stringify({name: "error", error: `There is not such guid existing: ${otherGuid}`}));
-			return;
-		}
-		if (myGuid === otherGuid) {
-			ws.send(JSON.stringify({name: "error", error: `You cannot enter the same guid as yours`}));
-			return;
-		}
-
-		if (searchRandom.has(otherGuid) || searchRandom.has(myGuid)) {
-			// TODO: decide what to do
-			ws.send(JSON.stringify({name: "error", error: "Error during connection"}));
-			return;
-		}
-
-		joinRoom(
-			roomGuidToRoom,
-			userGuidToRoomGuid,
-			guidToSocket,
-			myGuid,
-			otherGuid
-		);
-	},
-	moveSnake: (event) => {
-		const roomGuid = userGuidToRoomGuid.get(event.player);
-		const room = roomGuidToRoom.get(roomGuid);
-		room.updatePlayer(event.player, event.direction);
-	},
-	generateFood: (event) => {
-		let gameState = event.gameState;
-		generateFood(
-			roomGuidToRoom.get(userGuidToRoomGuid.get(myGuid)),
-			gameState,
-			guidToSocket
-		);
-	},
-	searchRandom: (event) => {
-		searchRandom.add(myGuid);
-		if (searchRandom.size >= 2) {
-			searchRandom.delete(myGuid);
-			let otherGuid = "";
-			// get some element from set
-			for (let guid of searchRandom) {
-				if (guid) {
-					otherGuid = guid;
-					break;
-				}
-			}
-			searchRandom.delete(otherGuid);
-
-			joinRoom(
-				roomGuidToRoom,
-				userGuidToRoomGuid,
-				guidToSocket,
-				myGuid,
-				otherGuid
-			);
-		}
-	}
-
-};
-
 function configureWsServer(server) {
 	const webSocketServer = new WebSocket.Server({ server });
 
@@ -94,8 +29,66 @@ function configureWsServer(server) {
 		ws.send(JSON.stringify(connectionEvent));
 		ws.on("message", (message) => {
 			const event = JSON.parse(message);
-			const handler = eventHandlers[event.name];
-			handler(event);
+
+			// TODO: create object of handlers
+			if (event.name === "joinMeWith") {
+				const otherGuid = event.data;
+				if (!checkExistingGuid(guidToSocket, otherGuid)) {
+					ws.send(JSON.stringify({name: "error", error: `There is not such guid existing: ${otherGuid}`}));
+					return;
+				}
+				if (myGuid === otherGuid) {
+					ws.send(JSON.stringify({name: "error", error: `You cannot enter the same guid as yours`}));
+					return;
+				}
+
+				if (searchRandom.has(otherGuid) || searchRandom.has(myGuid)) {
+					// TODO: decide what to do
+					ws.send(JSON.stringify({name: "error", error: "Error during connection"}));
+					return;
+				}
+
+				joinRoom(
+					roomGuidToRoom,
+					userGuidToRoomGuid,
+					guidToSocket,
+					myGuid,
+					otherGuid
+				);
+			} else if (event.name === "moveSnake") {
+				const roomGuid = userGuidToRoomGuid.get(event.player);
+				const room = roomGuidToRoom.get(roomGuid);
+				room.updatePlayer(event.player, event.direction);
+			} else if (event.name === "generateFood") {
+				let gameState = event.gameState;
+				generateFood(
+					roomGuidToRoom.get(userGuidToRoomGuid.get(myGuid)),
+					gameState,
+					guidToSocket
+				);
+			} else if (event.name === "searchRandom") {
+				searchRandom.add(myGuid);
+				if (searchRandom.size >= 2) {
+					searchRandom.delete(myGuid);
+					let otherGuid = "";
+					// get some element from set
+					for (let guid of searchRandom) {
+						if (guid) {
+							otherGuid = guid;
+							break;
+						}
+					}
+					searchRandom.delete(otherGuid);
+
+					joinRoom(
+						roomGuidToRoom,
+						userGuidToRoomGuid,
+						guidToSocket,
+						myGuid,
+						otherGuid
+					);
+				}
+			}
 		});
 
 		ws.on("close", () => {
