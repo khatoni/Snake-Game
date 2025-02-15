@@ -3,9 +3,9 @@ const http = require("http");
 const path = require("path");
 const cors = require("cors");
 const configureWsServer = require("./infrastructure/ws-server");
-const authApiRouter = require("./routes/auth");
+const authRouter = require("./routes/auth");
 const pagesRouter = require("./routes/pages");
-const { connectDB } = require("./infrastructure/database");
+const connectDB = require("./infrastructure/database");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const { errorLogger, errorHandler } = require("./infrastructure/error");
@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 // Routes
 app.use("/", pagesRouter);
-app.use("/auth", authApiRouter);
+app.use("/auth", authRouter);
 app.use("*", (req, res) => {
 	res.redirect("/");
 });

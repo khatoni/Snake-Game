@@ -1,9 +1,9 @@
 const errorMessages = require("../constants/errorMessages");
 const infrConstants = require("../constants/infrastructure");
-const User = require('../db-models/user');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const config = require('../config/config')['development'];
+const User = require("../db-models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../config/config")["development"];
 
 const generateToken = (data) => {
 	return jwt.sign(data, config.privateKey, { expiresIn: "1h" });
@@ -15,7 +15,7 @@ const register = async function (req, res) {
 		const user = await User.findOne({ username });
 
 		if (user !== null) {
-			return res.status(400).render('register',{
+			return res.status(400).render("register", {
 				error: errorMessages.userExists,
 			});
 		}
@@ -29,11 +29,10 @@ const register = async function (req, res) {
 
 		setTokenCookie(res, userObj);
 
-		return res.redirect('/');
+		return res.redirect("/");
 	} catch (error) {
-		// redirect to same page with temp data
 		console.error(error);
-		return res.status(400).render('register',{
+		return res.status(400).render("register", {
 			error: errorMessages.databaseUpdateError,
 		});
 	}
@@ -46,7 +45,7 @@ const login = async function (req, res) {
 		const user = await User.findOne({ username });
 
 		if (user === null) {
-			return res.status(404).render('login', {
+			return res.status(404).render("login", {
 				error: errorMessages.invalidUsernamePassword,
 			});
 		}
@@ -55,16 +54,15 @@ const login = async function (req, res) {
 
 		if (status) {
 			setTokenCookie(res, user);
-			return res.redirect('/');
+			return res.redirect("/");
 		} else {
-			// redirect to same page with short-living data
-			return res.status(400).render('login', {
+			return res.status(400).render("login", {
 				error: errorMessages.wrongCredentials,
 			});
 		}
 	} catch (error) {
 		console.error(error);
-		return res.status(400).render('login', {
+		return res.status(400).render("login", {
 			error: errorMessages.wrongCredentials,
 		});
 	}
@@ -77,12 +75,12 @@ const setTokenCookie = function (res, user) {
 	});
 
 	res.cookie(infrConstants.authCookieName, token, {
-		httpOnly: true,  
-		secure: true,    
-		sameSite: 'Strict', 
+		httpOnly: true,
+		secure: true,
+		sameSite: "Strict",
 		maxAge: 60 * 60 * 1000, // 1 hour
 	});
-}
+};
 
 const validateRequestData = function (username, password, res) {
 	if (!username) {

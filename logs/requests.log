@@ -1,1 +1,13 @@
 2025-02-12T21:07:44.866Z - GET /auth/login - Error: This is an error
+2025-02-15T09:49:26.945Z - GET /auth/login - Error: Not implemented
+2025-02-15T09:49:43.462Z - GET /auth/login - Error: Not implemented
+2025-02-15T09:50:05.209Z - GET /auth/login - Error: Not implemented
+2025-02-15T09:50:27.060Z - GET /auth/login - ReferenceError: D:\FMI HW\Semester7\JS\JS-Advanced\pages\login.ejs:25
+    23| 			<button class="button" id="mybut" type="submit">Login</button>
+    24| 		</form>
+ >> 25| 		<% if (error) { %>
+    26| 			<p class="error" style="color: black; font-weight: bold;"><%= error %></p>
+    27| 		<% } %>
+    28| 		<div>
+
+error is not defined

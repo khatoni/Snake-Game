@@ -11,5 +11,8 @@
     <div class="container">
       <a class="button" href="/home">Go home</a>
     </div>
+		<% if (error) { %>
+			<p class="error"><%= error %></p>
+		<% } %>
   </body>
 </html>

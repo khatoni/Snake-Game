@@ -1,12 +1,12 @@
 const GAME_SPEED = 500;
-const boardSize = 21;
+const BOARD_SIZE = 20;
 
 function hasCollision(players, guid1, guid2) {
 	const snakeHeadGuid1 = players[guid1].snake[0];
 	const snakeHeadGuid2 = players[guid2].snake[0];
 	const answer = {};
 
-	if(isSamePosition(snakeHeadGuid1, snakeHeadGuid2)) {
+	if (isSamePosition(snakeHeadGuid1, snakeHeadGuid2)) {
 		answer.winner = null;
 		return answer;
 	}
@@ -53,15 +53,16 @@ function isSamePosition(position1, position2) {
 function isInsideBoard(position) {
 	return (
 		position.x >= 1 &&
-		position.x < boardSize &&
+		position.x <= BOARD_SIZE &&
 		position.y >= 1 &&
-		position.y < boardSize
+		position.y <= BOARD_SIZE
 	);
 }
 
 module.exports = {
-    GAME_SPEED,
-    hasCollision,
-    isSamePosition,
-    isInsideBoard,
+	GAME_SPEED,
+	BOARD_SIZE,
+	hasCollision,
+	isSamePosition,
+	isInsideBoard,
 };
