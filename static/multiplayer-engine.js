@@ -119,7 +119,7 @@ function handleUserInput() {
 		}
 	});
 }
-function debounce(func, timeout = 200) {
+function debounce(func, timeout = 150) {
 	let timer;
 	return (...args) => {
 		clearTimeout(timer);
