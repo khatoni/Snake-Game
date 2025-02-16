@@ -7,7 +7,7 @@ module.exports = {
 	},
 	production: {
 		privateKey: "DEV-TEST",
-		databaseUrl: "",
+		databaseUrl: "mongodb+srv://tonimalkiq:eLAjuINbka7rkxGs@cluster0.ivd90.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     },
     getConfig: function () {
         return this[this.env];
