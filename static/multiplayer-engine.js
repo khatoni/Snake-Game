@@ -228,10 +228,15 @@ function moveEvent(event) {
 function registerEvents() {
 	const searchRandomButton = document.getElementById("search-random");
 	searchRandomButton.addEventListener("click", (_) => {
+		if(isPlayingGame) {
+			showErrorConnectGuid("You are already playing");
+			return;
+		}
 		const banners = document.querySelectorAll(".banner");
 		banners.forEach((element) => {
 			element.remove();
 		});
+		searchRandomButton.style.display = "none";
 		document.getElementById("join-with-guid").style.display = "none";
 		document.getElementById("error-messages").textContent = "";
 		setMessage("Searching for opponent...");
