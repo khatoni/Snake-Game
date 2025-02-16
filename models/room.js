@@ -57,8 +57,8 @@ class Room {
 
 		while (this.state[this.data.food.x][this.data.food.y] !== 0) {
 			this.data.food = {
-				x: Math.floor(Math.random() * BOARD_SIZE),
-				y: Math.floor(Math.random() * BOARD_SIZE),
+				x: Math.floor(Math.random() * BOARD_SIZE) + 1,
+				y: Math.floor(Math.random() * BOARD_SIZE) + 1,
 			};
 		}
 
