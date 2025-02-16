@@ -70,11 +70,13 @@ function setMessage(message) {
 	messagesDiv.innerHTML = message;
 }
 
+let bricks = [];
 function initialize(initData) {
 	setMessage("Game started!");
 	Object.assign(data, initData);
 	otherGuid = data.guids.find((guid) => guid !== myGuid);
 	food = data.food;
+	bricks = data.bricks;
 	renderBoard();
 }
 
@@ -185,6 +187,14 @@ function renderBoard() {
 	renderSnake(data[myGuid].snake, 1);
 	renderSnake(data[otherGuid].snake, 2);
 	renderFood();
+
+	bricks.forEach((brick) => {
+		const brickElement = document.createElement("div");
+		brickElement.style.gridColumn = brick.x;
+		brickElement.style.gridRow = brick.y;
+		brickElement.classList.add("brick");
+		board.appendChild(brickElement);
+	})
 }
 
 let isPlayingGame = false;

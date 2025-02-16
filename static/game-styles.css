@@ -19,6 +19,10 @@
 	background-color: red;
 }
 
+.brick {
+	background-color: black;
+}
+
 #info-banner{
 	display: flex;
 	justify-content: space-between;

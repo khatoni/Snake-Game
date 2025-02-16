@@ -43,6 +43,18 @@ function hasCollision(players, guid1, guid2) {
 		}
 	}
 
+	const bricks = players.bricks;
+	for (let i = 0; i < bricks.length; i++) {
+		if (isSamePosition(bricks[i], snakeHeadGuid1)) {
+			answer.winner = guid2;
+			return answer;
+		}
+		if (isSamePosition(bricks[i], snakeHeadGuid2)) {
+			answer.winner = guid1;
+			return answer;
+		}
+	}
+
 	return false;
 }
 

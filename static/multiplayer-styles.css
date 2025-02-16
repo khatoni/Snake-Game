@@ -33,6 +33,10 @@
 	background-color: red;
 }
 
+.brick {
+	background-color: black;
+}
+
 .error {
 	color: red;
 	font-weight: bolder;

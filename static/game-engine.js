@@ -7,19 +7,45 @@ let food = { x: 5, y: 5 };
 let gameState = Array.from({ length: 22 }, () => Array(22).fill(0));
 let gameInterval;
 
+// []{x, y}
+// brick code => 50
+const bricks = [];
+
 let direction = { x: 1, y: 0 };
 
 initialize();
 
+function isNearStart(x, y) {
+	return 8 <= x && x <= 12 && 8 <= y && y <= 12
+}
+
+function generateBricks() {
+	bricks.push({ x: 1, y: 2})
+	gameState[1][2] = 50;
+	for(let i = 0; i < 5; i++) {
+		while(true) {
+			const x = (Math.round(Math.random() * 20)) % 20 + 1;
+			const y = (Math.round(Math.random() * 20)) % 20 + 1;
+			if(gameState[x][y] == 0 && !isNearStart(x, y)) {
+				gameState[x][y] = 50;
+				bricks.push({ x, y });
+				break;
+			}
+		}
+	}
+}
+
 function initialize() {
 	snake.push({ x: 10, y: 10 });
 	gameState[10][10] = 1;
+	gameState[food.x][food.y] = 49;
 	handleUserInput();
 	const select = document.getElementById("speed-select");
 	select.addEventListener("change", (event) => {
 		const selectedSpeed = event.target.value;
 		changeSpeed(selectedSpeed);
 	});
+	generateBricks();
 
 	gameInterval = setInterval(() => {
 		moveSnake();
@@ -87,6 +113,14 @@ function renderBoard() {
 	foodElement.style.gridRow = food.y;
 	foodElement.classList.add("food");
 	board.appendChild(foodElement);
+
+	bricks.forEach((brick) => {
+		const brickElement = document.createElement("div");
+		brickElement.style.gridColumn = brick.x;
+		brickElement.style.gridRow = brick.y;
+		brickElement.classList.add("brick");
+		board.appendChild(brickElement);
+	})
 }
 
 function checkCollision() {
@@ -103,6 +137,13 @@ function checkCollision() {
 			return;
 		}
 	}
+
+	for(let i = 0; i < bricks.length; i++) {
+		if(head.x === bricks[i].x && head.y === bricks[i].y) {
+			endGame();
+			return;
+		}
+	}
 }
 
 function isInsideBoard(position) {
@@ -114,11 +155,31 @@ function isInsideBoard(position) {
 	);
 }
 
+// input new food x, new food y
+function bricksAroundFood(x, y) {
+	let brickSidesCount = 0;
+	if(x - 1 <= 0 || gameState[x - 1][y] == 50) {
+		brickSidesCount++;
+	}
+	if(x + 1 > 20 || gameState[x + 1][y] == 50) {
+		brickSidesCount++;
+	}
+	if(y + 1 > 20 || gameState[x][y + 1] == 50) {
+		brickSidesCount++;
+	}
+	if(y - 1 <= 0 || gameState[x][y - 1] == 50) {
+		brickSidesCount++;
+	}
+	return brickSidesCount;
+}
+
 function generateFood(gameState) {
 	while (true) {
-		let foodX = Math.round(Math.random() * 20) + 1;
-		let foodY = Math.round(Math.random() * 20) + 1;
-		if (!gameState[foodX][foodY]) {
+		let foodX = (Math.round(Math.random() * 20)) % 20 + 1;
+		let foodY = (Math.round(Math.random() * 20)) % 20 + 1;
+		//foodX = 1; foodY = 1;
+		if (!gameState[foodX][foodY] && bricksAroundFood(foodX, foodY) <= 2) {
+			gameState[foodX][foodY] = 49;
 			return { x: foodX, y: foodY };
 		}
 	}
